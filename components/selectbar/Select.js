@@ -12,7 +12,8 @@ class Select extends React.PureComponent {
         return (
             <View>
                 <Form style={{
-                    paddingLeft: 10
+                    paddingLeft: 10,
+                    marginTop:15
                 }}>
                     <Label style={{
                         fontSize: 15
@@ -46,8 +47,8 @@ class Select extends React.PureComponent {
                             color: "grey"
                         }}
                      >
-                        <Picker.Item label="15min" value="15min"/> 
-                        <Picker.Item label="24h" value="24h"/>
+                        <Picker.Item label="15min" value="15 minutes"/> 
+                        <Picker.Item label="24h" value="24 heures"/>
                     </Picker>
                 </Form>
             </View>

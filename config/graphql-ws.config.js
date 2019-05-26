@@ -1,7 +1,7 @@
 import {ApolloClient} from "apollo-client";
 import {WebSocketLink} from "apollo-link-ws";
 import {HttpLink} from "apollo-link-http";
-import {split,concat, ApolloLink,Observable} from "apollo-link";
+import {split,concat, ApolloLink} from "apollo-link";
 import {getMainDefinition} from "apollo-utilities";
 import {InMemoryCache} from 'apollo-cache-inmemory';
 import {extractAuthToken} from '../graphql-utilities/gql-utils';
@@ -22,11 +22,11 @@ const authMiddleware = new ApolloLink((operation, forward) => {
 
 
 const httpLink=new HttpLink({
-   uri: 'http://192.168.1.3:'+WS_PORT+'/graphql'
+   uri: 'http://192.168.43.226:'+WS_PORT+'/graphql'
 })
 
 const wsLink = new WebSocketLink({
-  uri: `ws://192.168.1.3:${WS_PORT}/graphql`,
+  uri: `ws://192.168.43.226:${WS_PORT}/graphql`,
   options: {
     reconnect: true
   }

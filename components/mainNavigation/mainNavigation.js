@@ -1,18 +1,16 @@
 import {createDrawerNavigator, createBottomTabNavigator,createAppContainer,DrawerActions,createStackNavigator, DrawerItems,createSwitchNavigator} from 'react-navigation';
 import DashboardPage from "../../pages/dashboard"
 import React from "react"
-import UpdateCredentials from "../../pages/updateCredentials/updateCrendentials"
-import UpdateEmailPage from "../../pages/updateEmail/updateEmail"
-import UpdatePasswordPage from "../../pages/updatePassword/updatePassword"
-import ConfirmCodePage from "../../pages/confirmCode/confirmCode"
-import {Container,Header,Content,Body,Text,Footer} from "native-base"
-import {Image,View} from "react-native"
+import SettingPage from "../../pages/settings/setting"
+import {Container,Header,Content,Text,Footer} from "native-base"
 import BigProfileImage from './bigProfilePic/BigProfilePic';
 import SmallProfileImage from './smallProfilePic/SmallProfilePic';
 import Logout from '../logout/logout';
-import Login from '../../pages/login/Login'
 import SingleArticleView from '../../pages/singleArticle/SingleArticle';
-import ResetPasswordPage from '../../pages/resetPassword/resetPassword';
+import UpdateCredentialsPage from "../../pages/updateCredentials/updateCrendentials"
+import UpdateEmailPage from "../../pages/updateEmail/updateEmail"
+import UpdatePasswordPage from "../../pages/updatePassword/updatePassword"
+import ConfirmCode from "../../pages/confirmCode/confirmCode"
 
 
 const MainNavigationDrawer = createDrawerNavigator(
@@ -23,30 +21,39 @@ const MainNavigationDrawer = createDrawerNavigator(
                 SingleArticleView: SingleArticleView,
             },{headerMode: "none"}) 
         },
-        "Mon profile": {
-            screen: UpdateCredentials
-        },
-        "Modifier adresse email": {
+        "Parametres": {
             screen: createStackNavigator({
-                updateEmail: UpdateEmailPage,
-                confirmCode: ConfirmCodePage
+                setting: SettingPage,
+                profile: UpdateCredentialsPage,
+                UpdateEmail: UpdateEmailPage,
+                UpdatePassword: UpdatePasswordPage,
+                confirmCode: ConfirmCode
             },{headerMode: "none"})
         },
-        "Modifier mot de passe": {
-            screen: createStackNavigator({
-                updatePassword: UpdatePasswordPage,
-                confirmCode: ConfirmCodePage,
+        // "Mon profile": {
+        //     screen: UpdateCredentials
+        // },
+        // "Modifier adresse email": {
+        //     screen: createStackNavigator({
+        //         updateEmail: UpdateEmailPage,
+        //         confirmCode: ConfirmCodePage
+        //     },{headerMode: "none"})
+        // },
+        // "Modifier mot de passe": {
+        //     screen: createStackNavigator({
+        //         updatePassword: UpdatePasswordPage,
+        //         confirmCode: ConfirmCodePage,
                 
-            },{headerMode: "none"})
-        },
-        "Déconnection": {
-            screen:createSwitchNavigator({Logout:Logout,Login:Login},{headerMode:"none"})
-            /*createStackNavigator({
-                Logout:Logout,
-                //lin:Login,
-                //rp:ResetPasswordPage,
-            },{headerMode:"none"})*/
-        }
+        //     },{headerMode: "none"})
+        // },
+        // "Déconnection": {
+        //     screen:createSwitchNavigator({Logout:Logout,Login:Login},{headerMode:"none"})
+        //     /*createStackNavigator({
+        //         Logout:Logout,
+        //         //lin:Login,
+        //         //rp:ResetPasswordPage,
+        //     },{headerMode:"none"})*/
+        // }
     },
     {
         drawerPosition: "left",
@@ -73,25 +80,11 @@ const customDrawerContent = (props) => {
     return (
         <Container style={{width: '100%', marginLeft: 0, paddingLeft: 0, paddingRight: 0, marginRight: 0}} >
 
-            <Header style={{width:'100%',height: 200,backgroundColor: "red", marginLeft: 0, paddingLeft: 0, paddingRight: 0, marginRight: 0}}>
-                    {/*<Image 
-                        // I used my static image  ==> you can replace it
-                        source={require("../../assets/images/amine.jpg")} 
-                        style={{height: "100%",width: "100%"}}
-                        blurRadius={3}
-                    />*/}
+            <Header style={{width:'100%',height: 200,marginLeft: 0, paddingLeft: 0, paddingRight: 0, marginRight: 0}}>
                     <BigProfileImage/>
                     
             </Header>
-            <View style={{width:"100%",height:200 ,display: "flex",justifyContent: "center",alignItems: "center",position: "absolute",top:0,left: 0}}>
-                {/*<Image
-                    // I used my static image  ==> you can replace it
-                    source={require("../../assets/images/amine.jpg")} 
-                    style={{height: 100,width: 100,borderRadius:75}}
-                />*/}
-                <SmallProfileImage/>
-                {/* <Text style={{marginTop:10,fontSize:17,color:"white"}}>{JSON.stringify(props.user)}</Text> */}
-            </View>
+            <SmallProfileImage/>
 
             <Content>
                     
@@ -103,6 +96,9 @@ const customDrawerContent = (props) => {
                        props.onItemPress(route);
                     }
                 }}/>
+                {/* <Button mode="text">Logout</Button> */}
+                {/* <TouchableOpacity style={{height:50}}><Text style={{fontSize:13, marginLeft:16}}>Logout</Text></TouchableOpacity> */}
+                
             </Content>
 
             <Footer style={{display: "flex",justifyContent:"center", alignItems:"center",backgroundColor:"#f0f2f5"}}>

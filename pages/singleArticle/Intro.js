@@ -1,15 +1,14 @@
 import React from "react"
-import { View, Text, Content } from "native-base";
-
-
+import {Banner} from "react-native-paper"
+import {View} from "react-native"
 const Intro = (props) => {
     return (
-        <View style={{
-            marginTop:15,
-            marginBottom:20,
-            paddingLeft: 10
-        }}>
-            <Text style={{color:"#0984e3",fontWeight:"bold"}}>{"Vous etes en train de suivre un article du projet "+props.projectType+" sur la période "+props.period}</Text>
+        <View style={{paddingLeft: 10, paddingRight: 10,marginTop: 15, marginBottom:15}}>
+            <Banner
+                visible={true}
+                actions={[]}>
+                {"Vous etes en train de suivre un article du projet "+props.projectType+" sur la période "+props.period}
+            </Banner>
         </View>
     )
 }

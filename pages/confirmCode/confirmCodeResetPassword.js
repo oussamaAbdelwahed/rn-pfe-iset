@@ -1,11 +1,10 @@
 import React from "react"
-import { StyleSheet, View,Text,Platform,StatusBar, Keyboard } from "react-native"
+import { StyleSheet, View,Text,Platform,StatusBar,Keyboard } from "react-native"
 import { withNavigation } from 'react-navigation'
 import UserService from "../../shared/UserService"
 import {Button,TextInput,HelperText,Snackbar} from "react-native-paper"
-import {SecureStore} from "expo"
-import Header from "../../components/header/header"
-class ConfirmCodePage extends React.Component {
+
+class ConfirmCodeResetPasswordPage extends React.Component {
 
     state= {
         codeConfirmation: "",
@@ -17,42 +16,29 @@ class ConfirmCodePage extends React.Component {
     handleSubmit = () => {
         
         const email = this.props.navigation.getParam("email")
-        const type = this.props.navigation.getParam("type")
         this.setState({
             wrongCodeConfirmation: "",
             disabledButton:true
         })
 
-        UserService.verifyResetEmailCode(email,this.state.codeConfirmation)
+        UserService.verifyResetPasswordCode(this.state.codeConfirmation)
                 .then((res) => {
                     if(res.status === 200) {
-
-                        //this.showSuccessAlert("Vos modifications ont été mises à jour. Vous devez vous connecter maintenant")
-
-                        this.setState({successCodeMessage:"Vos modifications ont été mises à jour. Vous devez vous connecter maintenant"})
-                        
-                        setTimeout(async () => {
-                            console.log("Logout")
-                            this.setState({disabledButton: false})
-                            await SecureStore.deleteItemAsync("authToken")
-
-                            
-                            this.props.navigation.navigate("Login")
-                        },3050)
-                        
+                        // redirect to new password page with code conf
+                        this.props.navigation.navigate("SetNewPassword", {
+                            code: this.state.codeConfirmation
+                        })
                     }else{
                         this.setState({
                             wrongCodeConfirmation: "Code de confirmation est incorrect",
                             disabledButton:false
-                            
                         })
                     }
                 })
                 .catch((err) => {
-                    console.log(err)
-                    this.setState({
-                        wrongCodeConfirmation: "Code de confirmation est incorrect",
-                        disabledButton:false
+                   this.setState({
+                      wrongCodeConfirmation: "Code de confirmation est incorrect",
+                      disabledButton:false  
                     })
                 })
                 .finally(() => Keyboard.dismiss())
@@ -70,7 +56,18 @@ class ConfirmCodePage extends React.Component {
                     <Text style={styles.header_title}>Code de confirmation</Text>
                 </View>
 
+                    <Button 
+                        mode="text"
+                        style={{width:100,marginBottom:30}}
+                        onPress= {()=>{this.props.navigation.navigate("rp")}}>
+                        Retour
+                    </Button>
+
+
+
+
                 <View style={{paddingLeft:10,paddingRight:10}}>
+
                     <Text style={styles.text_description}>Verifier votre boite email pour le code de confirmation</Text>
 
                     <TextInput
@@ -154,4 +151,4 @@ const styles = StyleSheet.create({
 
 
 
-export default withNavigation(ConfirmCodePage)
+export default withNavigation(ConfirmCodeResetPasswordPage)

@@ -1,9 +1,8 @@
 import React from "react"
-import { View, Text,StyleSheet,Platform,StatusBar,ActivityIndicator} from "react-native"
-import {Form, Label,Item,Button,Toast,Root} from "native-base"
-import {InputItem} from "@ant-design/react-native"
+import { View, Text,StyleSheet,Platform,StatusBar,Keyboard} from "react-native"
 import UserService from "../../shared/UserService"
 import {withNavigation} from "react-navigation"
+import {Button, TextInput, Snackbar, HelperText} from "react-native-paper"
 
 
 class SetNewPasswordPage extends React.Component {
@@ -13,7 +12,9 @@ class SetNewPasswordPage extends React.Component {
         confirmPassword: "",
         newPasswordError: "",
         confirmPasswordError: "",
-        isLoading:false
+        isLoading:false,
+        errorNetwork: "",
+        successNetwork: ""
     }
 
 
@@ -60,21 +61,27 @@ class SetNewPasswordPage extends React.Component {
                 UserService.setNewPasswordReset(this.state.newPassword,code)
                     .then((res) => {
                         if(res.status === 200) {
-                            this.showSuccessAlert("Vos modifications ont été mises à jour. Vous devez vous connecter maintenant")
-                            this.setState({isLoading:false})
+                            this.setState({
+                                successNetwork: "Vos modifications ont été mises à jour. Vous devez vous connecter maintenant",
+                                isLoading:false
+                            })
                             setTimeout(() => {
                                 this.props.navigation.navigate("Login")
-                                //this.props.navigation.navigate("lin")
-                            },2050)
+                            },3050)
                         
                         }else {
-                            this.showErrorAlert("Erreur Interne du Serveur")
+                            this.setState({
+                                errorNetwork: "Erreur Interne du Serveur!.Veuillez ressayer plus tard..."
+                            })
                         }
                     })
                     .catch((err) =>{
                         this.setState({isLoading:false})
-                       console.log(err)
+                        this.setState({
+                            errorNetwork: "Erreur Interne du Serveur"
+                        })
                     })
+                    .finally(()=>Keyboard.dismiss())
             }else {
                 this.setState({
                     newPasswordError: "Rétaper votre mot de passe",
@@ -85,82 +92,88 @@ class SetNewPasswordPage extends React.Component {
     }
 
 
-    showSuccessAlert = (message) => {
-        Toast.show({
-            type: "success",
-            position: "top",
-            text: message,
-            duration: 2000
-        })
-    }
-
-    showErrorAlert = (message) => {
-        Toast.show({
-            type: "warning",
-            position: "top",
-            text: message,
-            duration: 2000
-        })
-    }
-
-
     render() {
         return (
             <View style={styles.view_container}>
-                <View>
-                   <Button style={{marginLeft:4,marginBottom:20,backgroundColor:"#1B9CFC",width:60,display:"flex",alignContent:"center",justifyContent:"center"}} onPress= {()=>{this.props.navigation.navigate("Login")}}>
-                       <Text style={{textAlign:"center",color:"white",fontWeight:"bold"}}>{'retour'}</Text>
-                   </Button>
-                </View>
-                <Root>
                     {/* Title */}
                     
                     <View>
                         <Text style={styles.header_title}>Réinitialiser le mot de passe</Text>
                     </View>
 
+                    <Button 
+                        style={{width:100,marginBottom:30}} 
+                        onPress= {()=>{this.props.navigation.navigate("ConfirmCodeResetPasswordPage")}}
+                        mode="text">
+                       Retour
+                   </Button>
 
-                    {/* Formulaire */}
-                    <Form>
-                        <Item stackedLabel style={{marginTop:10,marginBottom:10}}>
-                            <Label>Saisir votre nouveau mot de passe !!</Label>
-                            <InputItem 
-                                type="password"
-                                defaultValue={this.state.newPassword}
-                                onChangeText={(value) => this.setState({newPassword: value})}
-                            />
-                        </Item>
-
+                   <View style={{paddingRight:10, paddingLeft: 10}}>
+                        <TextInput 
+                            secureTextEntry={true}
+                            label="Saisir votre nouveau mot de passe"
+                            value={this.state.newPassword}
+                            onChangeText={(value) => this.setState({newPassword: value})}
+                            error={this.state.newPasswordError!== ""}
+                            mode="outlined"
+                            style={{marginBottom: 10}}
+                            
+                        />
+                    </View>
                         {this.state.newPasswordError!== "" && 
-                            <Text style={styles.errorMessage}>{this.state.newPasswordError}</Text> 
+                            <HelperText visible={this.state.newPasswordError !== ""} type="error">
+                                {this.state.newPasswordError}
+                            </HelperText>
                         }
 
-
-
-
-                        <Item stackedLabel style={{marginTop:10,marginBottom:10}}>
-                            <Label>Rétaper votre nouveau mot de passe</Label>
-                            <InputItem 
-                                type="password"
-                                defaultValue={this.state.confirmPassword}
-                                onChangeText={(value) => this.setState({confirmPassword: value})}
-                            />
-                        </Item>
-
+                    <View style={{paddingRight:10, paddingLeft: 10}}>
+                        <TextInput 
+                            secureTextEntry={true}
+                            label="Rétaper votre nouveau mot de passe"
+                            value={this.state.confirmPassword}
+                            onChangeText={(value) => this.setState({confirmPassword: value})}
+                            error={this.state.confirmPasswordError!== ""}
+                            mode="outlined"
+                            style={{marginBottom: 10}}
+                        />
+                    </View>
                         {this.state.confirmPasswordError!== "" && 
-                            <Text style={styles.errorMessage}>{this.state.confirmPasswordError}</Text> 
+                            <HelperText visible={this.state.confirmPasswordError !== ""} type="error">
+                                {this.state.confirmPasswordError}
+                            </HelperText>
                         }
+                   
 
 
+                    <View style={{paddingLeft:10, paddingRight:10}}>
+                        <Button 
+                            mode="contained"
+                            onPress={this.handleSubmit}
+                            loading={this.state.isLoading}
+                            disabled={this.state.isLoading}>
+                                Mettre à jour
+                        </Button>
+                    </View>
 
-                        <View style={{paddingLeft:10, paddingRight:10}}>
-                            <Button type="primary" block style={styles.button} onPress={this.handleSubmit}>
-                                <Text style={styles.button_text}>Mettre à jour</Text>
-                                {this.state.isLoading ? <ActivityIndicator/> : null}
-                            </Button>
-                        </View>
-                    </Form>
-                </Root>
+
+                    {/* Error snackbar */}
+                    <Snackbar
+                        visible={this.state.errorNetwork !== ""}
+                        onDismiss={() => this.setState({errorNetwork: ""})}
+                        duration={3000}
+                        style={{backgroundColor: "#e74c3c"}}>
+                            {this.state.errorNetwork}
+                    </Snackbar>
+
+
+                    {/* Success snackbar */}
+                    <Snackbar
+                        visible={this.state.successNetwork !== ""}
+                        onDismiss={() => this.setState({successNetwork: ""})}
+                        duration={3000}
+                        style={{backgroundColor: "#27ae60"}}>
+                            {this.state.successNetwork}
+                    </Snackbar>
             </View>
         )   
     }

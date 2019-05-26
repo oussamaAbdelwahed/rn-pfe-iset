@@ -1,11 +1,12 @@
 import React from "react"
 import { Card, CardItem, Text, Left, Body } from 'native-base';
-import { Image, Animated,View, TouchableOpacity,Button } from "react-native" 
+import { Image, Animated,View } from "react-native" 
 import { AntDesign } from "@expo/vector-icons"
 import { Grid, Col} from "react-native-easy-grid"
 import { connect } from "react-redux"
 import {mustShowPageViewsVisualEffect,mustShowNbrSalesVisualEffect} from '../../../business-logic/audience-indicator';
-import  {withNavigation} from 'react-navigation';
+import  {withNavigation} from 'react-navigation'
+import {Button} from "react-native-paper"
 class CardArticle extends React.Component {
 
     state = {
@@ -27,7 +28,6 @@ class CardArticle extends React.Component {
     }
 
     onPressShowMoreBtn = (e) => {
-        console.log("here***0");
         const obj = {
             published_at:this.props.article.published_at,
             projectType: this.props.project.projectType,
@@ -80,7 +80,6 @@ class CardArticle extends React.Component {
     render() {
         return (
             <Animated.View style={{opacity: this.state.opacity}}>
-                <TouchableOpacity>
                     <Card style={{
                         marginBottom: 20
                     }}
@@ -98,7 +97,7 @@ class CardArticle extends React.Component {
                                             color: this.state.isAudWinner ? "green" : "red",
                                             
                                         }} note>{this.state.newAudiencePer} {" %"} 
-                                            <Text style={{fontSize:13}}> (Nombre de pages vues)</Text>
+                                            <Text style={{fontSize:16,color: this.state.isAudWinner ? "green" : "red"}}> (Nombre de pages vues)</Text>
                                         </Text>
                                         
                                         </View> : null}
@@ -144,10 +143,10 @@ class CardArticle extends React.Component {
                             padding:10
                         }}>
                            <Button
-                              title="voir plus"
                               accessibilityLabel="voir plus"
                               onPress={this.onPressShowMoreBtn}
-                           />
+                              mode="text"
+                           >Voir plus</Button>
                         </CardItem>
 
                         <CardItem footer bordered>
@@ -173,8 +172,6 @@ class CardArticle extends React.Component {
                             </Body>
                         </CardItem>
                     </Card>
-                </TouchableOpacity>
-        
             </Animated.View>
         )
     }

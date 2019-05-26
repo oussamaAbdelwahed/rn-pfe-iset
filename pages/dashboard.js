@@ -11,7 +11,7 @@ import { Spinner } from "native-base";
 import Counter from "../components/counter/counter"
 import { connect } from "react-redux"
 import {withNavigation} from 'react-navigation';
-
+import {Banner} from "react-native-paper"
 
 import {isLoggedIn} from '../utilities/utils';
 
@@ -75,6 +75,17 @@ class DashboardPage extends React.Component {
                         )
                     :
                         <React.Fragment>
+                            {/* banner for default password */}
+                            <View style={{paddingLeft: 10,paddingRight:10}}>
+                                <Banner
+                                    visible={this.props.user.isDefaultPwd === 1}
+                                    actions={[]}>
+                                    Votre mot de passe a été généré par l'admininstrateur.
+                                    Veuillez le changer pour etre en toute sécurité !
+                                </Banner>
+                            </View>
+
+
                             <Select 
                                 changingProject={this.changingProjectHandler}
                                 changingInterval={this.changingIntervalHandler}
@@ -104,7 +115,6 @@ class DashboardPage extends React.Component {
 
 
     getDashboardData = (project,interval,whenChangingSelect=false,logo=this.state.logo) => {
-        console.log("*******from dashboard project is "+project+"interval is "+interval)
   
 
         ArticleService.getAllArticles(project,interval)
@@ -123,7 +133,6 @@ class DashboardPage extends React.Component {
                         };
                     })
                 }).catch(err => {
-                    console.log(err)
                         this.setState({
                              NetworkErrorMessage: "Impossible de récupérer les données. Il y a une erreur interne",
                              isNetworkErrorShowed: true,
@@ -150,7 +159,6 @@ class DashboardPage extends React.Component {
         }
         if(nextState.isNetworkErrorShowed === true) return true;
         if(this.props.project.projectType !== nextProps.project.projectType) {
-            console.log("LOGO HAS BEEN CHANGED");
             return true;
         }
         if(this.state.isSelectsChanged !== nextState.isSelectsChanged) return true;

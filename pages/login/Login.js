@@ -1,14 +1,13 @@
 import React, {Component} from "react"
 import styles from './styles'
 import LoginService from '../../shared/LoginService';
-import { Form,Button, Text, Toast,Root} from 'native-base';
 import {saveAuthToken} from '../../graphql-utilities/gql-utils';
-import { InputItem, Icon } from "@ant-design/react-native"
-import { Image, TouchableOpacity ,View,StyleSheet } from "react-native"
+import { Image, TouchableOpacity ,View } from "react-native"
 import { connect } from "react-redux"
 import { getParsedToken } from "../../utilities/utils"
 import { withNavigation } from 'react-navigation'
-import { Spinner } from "native-base";
+
+import {TextInput, Button, HelperText,Snackbar, Text} from "react-native-paper"
 
 class LoginPage extends Component {
     state = {
@@ -16,138 +15,97 @@ class LoginPage extends Component {
         passwordValue:'',
         isLoading: false,
         loginWrongCredentialErrorMessage:'',
-        emailErrorMessage: '',
-        passwordErrorMessage: ''
+        loginError: false,
+        loginAlertVerifiedAccount:""
     };
 
-    onSubmitFormHandler = async () => {
-      this.setState({isLoading:true});
+    onSubmitFormHandler = () => {
       const email = this.state.emailValue;
       const password = this.state.passwordValue;
+        this.setState({
+          loginWrongCredentialErrorMessage: "",
+          loginError: false,
+          loginAlertVerifiedAccount:"",
+          isLoading: true
+        })
 
-        // validate the fields
-        if(email === "") {
-          this.setState({
-            emailErrorMessage: "Champ obligatoire",
-            isLoading:false
-          })
-        }else {
-          this.setState({
-            emailErrorMessage: ""
-          })
-        }
-
-
-        if(password === "") {
-          this.setState({
-            passwordErrorMessage: "Champ obligatoire",
-            isLoading:false
-          })
-        }else {
-          this.setState({
-            passwordErrorMessage: ""
-          })
-        }
-
-        if(email==="" || password===""){
-          console.log("oh oh")
-          this.setState({isLoading:false});
-          return;
-        }
-
-
-        // if fields are correct then submit the form
-        if(this.state.emailErrorMessage === "" && this.state.passwordErrorMessage === "") {
-            this.setState({
-              loginWrongCredentialErrorMessage: ""
-            })
-
-            console.log(email, password)
-            this.loginHandler(email,password)
-              .then((res) => {
-                if(res.login.token) {
-
+        
+        this.loginHandler(email,password)
+          .then((res) => {
+            if(res.login.token) {
                   // save token in Secure Store
                   saveAuthToken(res.login.token)
                 
                 
-                  // update the user and auth states
-                  getParsedToken(res.login.token).then((decryptedToken) => {
-                    this.props.SAVE_USER(decryptedToken)
-                    this.props.UPDATE_AUTH_STATUS(true)
-                    this.props.UPDATE_ADMIN_STATUS(decryptedToken.isAdmin>0)
+                   // update the user and auth states
+                   getParsedToken(res.login.token).then((decryptedToken) => {
+                     this.props.SAVE_USER(decryptedToken)
+                     this.props.UPDATE_AUTH_STATUS(true)
+                     this.props.UPDATE_ADMIN_STATUS(decryptedToken.isAdmin>0)
+                     this.setState({isLoading:false})
 
-                    // navigate to dashboard
-                    //this.props.navigation.navigate('tableaudebord')
-                    //this.setState({isLoading:false})
-                    this.props.navigation.navigate("Tableau de board");
-                  })
-                  .catch((err) => {
-                    console.log(err)
-                    this.setState({isLoading:false})
-                  })        
-                }
+                     
+                     // navigate to dashboard
+                     this.props.navigation.navigate("Tableau de board");
+                   })      
+            }
                 
-              })
+            })
               .catch((err) => {
                 this.setState({isLoading:false})
-                console.log(err)
-                let catchErrorMessage = err.message.split(":")[1]
-                
-                if(catchErrorMessage.trim() === "compte non verifié") {
-                  this.showErrorAlert("Compte non verifié. Pouvez-vous verifier votre boite mail pour un lien de confirmation")
-                
-                }else if(catchErrorMessage.trim() === "mot de passe invalide !" || catchErrorMessage.trim() === "email invalide !"){
-                  this.setState({
-                    loginWrongCredentialErrorMessage: "Adresse email ou mot de passe est invalide"
-                  })
-                
-                }else {
-                  this.setState({
-                    loginWrongCredentialErrorMessage: ""
-                  })
+                  console.log(err)
+                  let catchErrorMessage = err.message.split(":")[1]
+                  
+                  if(catchErrorMessage.trim() === "compte non verifié") {
+                    this.setState({
+                      loginAlertVerifiedAccount: "Compte non verifié. Pouvez-vous verifier votre boite mail pour un lien de confirmation"
+                    })
+                  
+                  }else if(catchErrorMessage.trim() === "mot de passe invalide !" || catchErrorMessage.trim() === "email invalide !"){
+                    this.setState({
+                      loginWrongCredentialErrorMessage: "Adresse email ou mot de passe est invalide",
+                      loginError: true,
+                      passwordValue: ""
+                    })
+                  
+                  }else {
+                    this.setState({
+                      loginWrongCredentialErrorMessage: "",
+                      loginError: false
+                    })
 
-                  this.showErrorAlert("Erreur Interne du Serveur. Ressayer plus tard")
-                }
+                    //this.showErrorAlert("Erreur Interne du Serveur. Ressayer plus tard")
+                  }
               })
-        }else{
-          console.log("HEEEEEEEERE");
-          this.setState({isLoading:false})
-        }
     }
 
 
-    loginHandler = async (email,password) => {
+    loginHandler = (email,password) => {
       return  LoginService.login(email,password)
     }
 
-
-    showErrorAlert = (message) => {
-        Toast.show({
-            type: "warning",
-            position: "top",
-            text: message,
-            duration: 3000
-        })
-    }
-    
 
     redirectToResetPassword = () => {
       this.props.navigation.navigate("rp")
     }
 
 
+    handleChangeEmail = (value) => {
+        this.setState({
+          emailValue: value
+        })
+    }
+
+    handleChangePassword = (value) => {
+      this.setState({
+        passwordValue: value
+      })
+  }
+
+
     render() {
-      if(this.state.isLoading) {
-        return (
-            <View style={styles.view_spinner_container}>
-                 <Spinner color="#e53d22"/>                            
-            </View>    
-        )
-     }
       return (
           <View style={styles.view_container}>
-            <Root>
               {/* View Logo JAMG */}
               <View style={{
                 marginTop:40,
@@ -160,113 +118,61 @@ class LoginPage extends Component {
               </View>
 
               {/* View form */}
-              <View style={{marginTop:50, marginBottom: 20}}>
-                <Form>
-                  {/* Email */}
-                  <View style={{
-                    marginBottom: 20
-                    }}>
-
-                      <InputItem
-                        clear
-                        type="email-address"
-                        placeholder="Adresse email"
-                        value={this.state.emailValue}
-                        error={this.state.emailErrorMessage !== "" ? true : false}
-                        onChange={(value) => {
-                          if(value && value.length >0) {
-                            this.setState({
-                              emailValue: value,
-                              emailErrorMessage:""
-                            })
-                          }else{
-                            this.setState({
-                              emailValue: value,
-                            })
-                          }
-                        }}>
-                          <Icon name={"mail"}/>
-                      </InputItem>
-
-                      {
-                        this.state.emailErrorMessage !== "" && 
-                          <Text style={{color: "#e53d22", marginLeft:10, fontSize:13}}>{this.state.emailErrorMessage}</Text>
+              <View style={{marginTop:50, marginBottom: 20, paddingLeft:10, paddingRight:10}}>
+                {/* Email */}
+                    <View>
+                      <TextInput 
+                        label="Adresse email"
+                        mode="outlined"
+                        style={{marginTop:15}}
+                        error={this.state.loginError}
+                        defaultValue={this.state.emailValue}
+                        onChangeText={value => this.handleChangeEmail(value)}
+                      />
+                      {this.state.loginError && <HelperText type="error">
+                          {this.state.loginWrongCredentialErrorMessage}
+                      </HelperText>
                       }
-
-                  
-                      
-                  </View>
+                    </View>
 
 
-                  {/* Password */}
-                  <View style={{
-                    marginBottom: 20
-                    }}>
-
-                      <InputItem
-                        clear
-                        type="password"
-                        placeholder="Mot de passe"
-                        value={this.state.passwordValue}
-                        error={this.state.passwordErrorMessage !== "" ? true : false}
-                        onChange={(value) => {
-                          if(value && value.length >0) {
-                            this.setState({
-                              passwordValue: value,
-                              passwordErrorMessage:""
-                            })
-                          }else{
-                            this.setState({
-                              passwordValue: value,
-                            })
-                          }
-                        }}>
-                          <Icon name={"lock"}/>
-                      </InputItem>
-                      
-                      
-                      {
-                        this.state.passwordErrorMessage !== "" && 
-                          <Text style={{color: "#e53d22", marginLeft:10, fontSize:13}}>{this.state.passwordErrorMessage}</Text>
-                      }
-
-{
-                      this.state.loginWrongCredentialErrorMessage !== "" && 
-                          <Text style={{color: "#e53d22", marginLeft:10, fontSize:13}}>{this.state.loginWrongCredentialErrorMessage}</Text>
-                      }
-
-                  </View>
+                    {/* Password */}
+                    <TextInput 
+                      label="Mot de passe"
+                      mode="outlined"
+                      secureTextEntry={true}
+                      defaultValue={this.state.passwordValue}
+                      onChangeText={value => this.handleChangePassword(value)}
+                    />
 
 
-                  <View style={{
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    marginTop:20
-                    }}>
-                        <Button 
-                          onPress={this.onSubmitFormHandler}
-                          style={{
-                            backgroundColor: "#e53d22",
-                            width: 150,
-                            textAlign: "center",
-                            flexDirection: "row",
-                            justifyContent: "center",
-                          }}>
-                            <Text>Login</Text>
-                        </Button>
-                  </View>            
-                </Form>
+                    {/* Button */}
+                    <View style={{marginTop: 15}}>
+                      <Button
+                        mode="contained"
+                        onPress={this.onSubmitFormHandler}
+                        loading={this.state.isLoading}
+                        disabled={this.state.isLoading}>
+                        Se connecter
+                      </Button>
+                    </View>
 
                 {/* Reset password link */}
                 <TouchableOpacity activeOpacity={0.8} onPress={this.redirectToResetPassword}>  
                     <Text style={{
                       fontSize:16,
                       paddingLeft: 10,
-                      paddingTop:10
+                      paddingTop:20
                     }}>Mot de passe oublié..?</Text>
                 </TouchableOpacity>
               </View>
-            </Root>
+
+            <Snackbar
+              visible={this.state.loginAlertVerifiedAccount !== ""}
+              duration={3000}
+              onDismiss={()=>{this.setState({loginAlertVerifiedAccount:""})}}>
+              {this.state.loginAlertVerifiedAccount}
+            </Snackbar>
           </View>
       )
     }

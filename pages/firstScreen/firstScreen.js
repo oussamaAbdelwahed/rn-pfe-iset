@@ -5,6 +5,7 @@ import MainNavigationDrawer from "../../components/mainNavigation/mainNavigation
 import { AppLoading, Font } from 'expo'
 import { Ionicons } from "@expo/vector-icons"
 import {withNavigation} from 'react-navigation';
+import SetNewPasswordPage from "../setNewPassword/setNewPassword"
 
 class FirstScreen extends React.Component {
 

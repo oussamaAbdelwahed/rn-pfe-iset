@@ -1,15 +1,15 @@
 import React from "react"
-import { Text, View, Picker } from "native-base"
-import {StyleSheet, Platform,StatusBar, Image, ScrollView,TouchableHighlight} from "react-native"
-import { Icon, Modal,List, WingBlank,Provider} from '@ant-design/react-native';
-import {Row, Col, Form, Label,Item,Input, Toast, Root,Button} from 'native-base';
+import { Text, View } from "native-base"
+import {StyleSheet, Platform,StatusBar, Image, ScrollView, Keyboard} from "react-native"
+import { Modal,Provider} from '@ant-design/react-native';
 import Header from "../../components/header/header"
-import Countries from "../../assets/countries.json"
 import {connect }from "react-redux"
 import UserService from "../../shared/UserService"
 import { ImagePicker, Permissions} from "expo"
-import {ToastAndroid,ActivityIndicator} from 'react-native';
+import {Picker} from 'react-native';
 import {BASE_URL} from '../../config/env';
+import {Button,TextInput,Snackbar,List, Banner} from "react-native-paper"
+import axios from "axios"
 class UpdateCredentials extends React.Component {
 
     state = {
@@ -22,14 +22,23 @@ class UpdateCredentials extends React.Component {
         imageProfile: "",
         showModalChoose: false,
         showUploadSpinner:false,
-        disabledSubmitButton:false
+        disabledSubmitButton:false,
+        errorNetwork: false,
+        successResponse: false
     }
 
     componentWillMount() {
+        //get all countries
+        axios.get("https://restcountries.eu/rest/v2/all")
+            .then(res => this.setState({countriesList: res.data}))
+    
+
+
+
+
         UserService.getUserCredentials(this.props.user.userId)
             .then((res) => {
                 this.setState({
-                    countriesList: [...Countries],
                     firstname: res.firstname,
                     lastname: res.lastname,
                     country: res.country,
@@ -56,36 +65,29 @@ class UpdateCredentials extends React.Component {
        
        UserService.updateProfileCredentials(credentials)
             .then((res) => {
-                this.showSuccessAlert("Vos informations ont été mises à jour avec succès...!")
+                //this.showSuccessAlert("Vos informations ont été mises à jour avec succès...!")
+                this.setState({successResponse: true})
 
                 // update project and intervale states
                 this.props.UPDATE_USER_PROJECT_TYPE(credentials.defaultSelectedProject)
                 this.props.UPDATE_USER_PROJECT_PERIOD(credentials.defaultSelectedProject)
+
+
+                //update user state
+                this.props.UPDATE_USER_LASTNAME(credentials.lastname)
+                this.props.UPDATE_USER_FIRSTNAME(credentials.firstname)
+
             })
             .catch((err) => {
-                this.showErrorAlert("Erreur Interne du Serveur!.Veuillez ressayer plus tard...")
+                //this.showErrorAlert("Erreur Interne du Serveur!.Veuillez ressayer plus tard...")
+                this.setState({
+                    errorNetwork: true
+                })
             }).finally(()=>{
                 this.setState({disabledSubmitButton:false})
+                Keyboard.dismiss()
             })
 
-    }
-
-    showSuccessAlert = (message) => {
-        Toast.show({
-            type: "success",
-            position: "top",
-            text: message,
-            duration: 3000
-        })
-    }
-
-    showErrorAlert = (message) => {
-        Toast.show({
-            type: "warning",
-            position: "top",
-            text: message,
-            duration: 3000
-        })
     }
 
     handlePickPicture = async (type) => {
@@ -99,13 +101,16 @@ class UpdateCredentials extends React.Component {
             if(!result.cancelled) {
                 this.setState({showUploadSpinner:true})
                 const oldPicName= this.state.imageProfile.substr(this.state.imageProfile.lastIndexOf("/")+1);
+
                 UserService.changeProfilePicture(result,oldPicName,this.props.user.userId).then((data)=>{
-                 this.setState({imageProfile: data.data.image,showUploadSpinner:false});
+                  this.setState({imageProfile: data.data.image,showUploadSpinner:false});
                   this.props.UPDATE_USER_PROFILE_PICTURE({bigImageUrl:data.data.image,minImageUrl:data.data.imageMin})
-                }).catch((error)=>{
-                 ToastAndroid.show('Une erreur est survenue! réssayer plus tard SVP.', ToastAndroid.SHORT);
-                 this.setState({showUploadSpinner:false})   
                 })
+                .catch((error)=>{
+                    this.setState({errorNetwork: true})
+                    this.setState({showUploadSpinner:false})   
+                })
+                .finally(() => Keyboard.dismiss())
             }
         }else {
             let result = await ImagePicker.launchImageLibraryAsync({
@@ -115,13 +120,16 @@ class UpdateCredentials extends React.Component {
             if(!result.cancelled) {
                 this.setState({showUploadSpinner:true})
                 const oldPicName= this.state.imageProfile.substr(this.state.imageProfile.lastIndexOf("/")+1);
+
                 UserService.changeProfilePicture(result,oldPicName,this.props.user.userId).then((data)=>{
                  this.setState({imageProfile: data.data.image,showUploadSpinner:false});
                   this.props.UPDATE_USER_PROFILE_PICTURE({bigImageUrl:data.data.image,minImageUrl:data.data.imageMin})
-                }).catch((error)=>{
-                 ToastAndroid.show('Une erreur est survenue! réssayer plus tard SVP.', ToastAndroid.SHORT);
-                 this.setState({showUploadSpinner:false})   
                 })
+                .catch((error)=>{
+                    this.setState({errorNetwork: true})
+                    this.setState({showUploadSpinner:false})   
+                })
+                .finally(() => Keyboard.dismiss())
             }
         }
 
@@ -150,9 +158,20 @@ class UpdateCredentials extends React.Component {
     render() {
        return(
             <View style={styles.view_container}>
-                <Root>
                 {/* We passe the shouldDisplayLogo, because we dnt want to show project logo in update cred screen */}
                 <Header navigation={this.props.navigation} shouldDisplayLogo={true}/>
+
+
+                {/* banner for default password */}
+                <View style={{paddingLeft: 10,paddingRight:10}}>
+                    <Banner
+                        visible={this.props.user.isDefaultPwd === 1}
+                        actions={[]}>
+                        Votre mot de passe a été généré par l'admininstrateur.
+                        Veuillez le changer pour etre en toute sécurité !
+                    </Banner>
+                </View>
+
 
                 <ScrollView>
                     {/* Form */}
@@ -169,86 +188,79 @@ class UpdateCredentials extends React.Component {
                                 source={{uri: BASE_URL+this.state.imageProfile}}/>
 
                             {/* Add btn upload */}
-                            <Button disabled={this.state.showUploadSpinner} type="ghost" style={styles.button} onPress={this.showModal}>
-                                <Text>Importer une image</Text> 
-                                { this.state.showUploadSpinner ? <ActivityIndicator/> : null}   
+                            <Button 
+                                disabled={this.state.showUploadSpinner} 
+                                mode="text"
+                                onPress={this.showModal}
+                                loading={this.state.showUploadSpinner}>
+                                Importer une image
                             </Button>
                         
                         </View>
 
-                        <Form>
-                            <Item stackedLabel>
-                                <Label>Prénom :</Label>
-                                <Input 
-                                    defaultValue={this.state.firstname}
-                                    onChangeText={(value) => this.setState({firstname: value})}/>
-                            </Item>
+                        <TextInput 
+                            value={this.state.firstname}
+                            onChangeText={(value) => this.setState({firstname: value})}
+                            mode="outlined"
+                            label="Prenom"
+                        />
+
+                        <TextInput 
+                            value={this.state.lastname}
+                            onChangeText={(value) => this.setState({lastname: value})}
+                            mode="outlined"
+                            label="Nom"
+                        />
 
 
+                        <View>
+                            <Picker
+      
+                                selectedValue={this.state.country}
+                                onValueChange={(value) => this.setState({country: value})}
+                                >
 
-                            <Item stackedLabel>
-                                <Label>Nom :</Label>
-                                <Input 
-                                    defaultValue={this.state.lastname}
-                                    onChangeText={(value) => this.setState({lastname: value})}/>
-                            </Item>
+                                {this.state.countriesList.map((item, key) => {
+                                    return <Picker.Item key={key} 
+                                        label={item.name} 
+                                        value={item.name+"|"+item.alpha2Code} 
+                                        />
+                                })}
+                            </Picker>
+                        </View>
 
 
-
-                            <Item stackedLabel>
-                                <Label>Pays :</Label>
+                        <View>
                                 <Picker
-                                    mode="dialog"
-                                    style={{ width: 300, marginLeft: 5}}
-                                    placeholder="Choisir votre pays"
-                                    selectedValue={this.state.country}
-                                    onValueChange={(value) => this.setState({country: value})}
+                                    selectedValue={this.state.defaultProject}
+                                    onValueChange={(value) => this.setState({defaultProject: value})}
                                     >
 
-                                    {this.state.countriesList.map((item, key) => {
-                                        return <Picker.Item key={key} 
-                                            label={item.country} 
-                                            value={item.country+"|"+item.abbreviation} 
-                                            />
-                                    })}
+                                    <Picker.Item label="The Africa Report" value="TAR"/>
+                                    <Picker.Item label="Jeune Afrique Business +" value="JAB"/>
+                                    <Picker.Item label="Jeune Afrique" value="JA"/>
                                 </Picker>
-                            </Item>
+                        </View>
 
+                        <View>
+                                <Picker
+                                    selectedValue={this.state.defaultPeriod}
+                                    onValueChange={(value) => this.setState({defaultPeriod: value})}
+                                    >
 
-                            <Item stackedLabel>
-                                <Label>Projet par defaut :</Label>
-                                    <Picker
-                                        mode="dialog"
-                                        style={{ width: 300, marginLeft: 5}}
-                                        selectedValue={this.state.defaultProject}
-                                        onValueChange={(value) => this.setState({defaultProject: value})}
-                                        >
+                                    <Picker.Item label="15 minutes" value="15min"/>
+                                    <Picker.Item label="24 heures" value="24h"/>
+                                </Picker>
+                        </View>
 
-                                            <Picker.Item label="The Africa Report" value="TAR"/>
-                                            <Picker.Item label="Jeune Afrique Business +" value="JAB"/>
-                                            <Picker.Item label="Jeune Afrique" value="JA"/>
-                                    </Picker>
-                            </Item>
-
-                            <Item stackedLabel>
-                                <Label>Durée par defaut :</Label>
-                                    <Picker
-                                        mode="dialog"
-                                        style={{ width: 300, marginLeft: 5}}
-                                        selectedValue={this.state.defaultPeriod}
-                                        onValueChange={(value) => this.setState({defaultPeriod: value})}
-                                        >
-
-                                            <Picker.Item label="15 minutes" value="15min"/>
-                                            <Picker.Item label="24 heures" value="24h"/>
-                                    </Picker>
-                            </Item>
-
-                            <Button disabled={this.state.disabledSubmitButton} type="primary" style={styles.button} onPress={(this.handleSubmit)}>
-                                <Text style={styles.button_text}>Mettre à jour</Text>
-                                {this.state.disabledSubmitButton ? <ActivityIndicator/> : null}
-                            </Button>
-                        </Form>
+                        <Button 
+                            disabled={this.state.disabledSubmitButton} 
+                            mode="contained"
+                            style={{marginTop:10}} 
+                            onPress={(this.handleSubmit)}
+                            loading={this.state.disabledSubmitButton}>
+                            Mettre à jour
+                        </Button>
                     </View>
                 </ScrollView>
 
@@ -262,29 +274,41 @@ class UpdateCredentials extends React.Component {
                         closable={true}
                         maskClosable={true}
                         >
-                        <List renderHeader={()=> {
-                            return (
-                                <View style={styles.modal_header}>
-                                    <Text style={styles.modal_header_text}>Choisir le type</Text>
-                                </View>
-                            )
-                        }}>
-                            <List.Item key={1} onPress={this.handlePickPicture.bind(this,"camera")}>                   
-                                <View>                                      
-                                    <Text style={styles.modal_option_text}>Depuis la caméra</Text>
-                                </View>
 
-                            </List.Item>
 
-                            <List.Item key={2} onPress={this.handlePickPicture.bind(this,"picture")}> 
-                                <View>                                      
-                                    <Text style={styles.modal_option_text}>Depuis la gallerie</Text>
-                                </View>
-                            </List.Item>
-                        </List>
+                                <List.Item 
+                                    key={1} 
+                                    onPress={this.handlePickPicture.bind(this,"camera")}
+                                    title="Depuis la caméra"
+                                    left={props => <List.Icon {...props} icon="add-a-photo"/>} 
+                                />
+                                <List.Item 
+                                    key={2} 
+                                    onPress={this.handlePickPicture.bind(this,"picture")}
+                                    title="Depuis la gallerie"
+                                    left={props => <List.Icon {...props} icon="camera"/>} 
+                                />
                         </Modal>
                 </Provider>
-                </Root>
+
+                {/* Error snackbar */}
+                <Snackbar
+                    visible={this.state.errorNetwork}
+                    onDismiss={() => this.setState({errorNetwork: false})}
+                    duration={3000}
+                    style={{backgroundColor: "#e74c3c"}}>
+                        Erreur Interne du Serveur!.Veuillez ressayer plus tard...
+                </Snackbar>
+
+
+                {/* Success snackbar */}
+                <Snackbar
+                    visible={this.state.successResponse}
+                    onDismiss={() => this.setState({successResponse: false})}
+                    duration={3000}
+                    style={{backgroundColor: "#27ae60"}}>
+                        Vos informations ont été mises à jour avec succès...!
+                </Snackbar>
             </View>
        ) 
        
@@ -315,7 +339,6 @@ const styles = StyleSheet.create(
 
         button: {
             marginTop: 10,
-            backgroundColor: "#e53d22",
             width: 150,
             textAlign: "center",
             flexDirection: "row",
@@ -360,7 +383,15 @@ const mapDispatchToProps = (dispatch) => {
       UPDATE_USER_PROFILE_PICTURE: (value) => dispatch({
         type: "UPDATE_USER_PROFILE_PICTURE",
         value
-      })
+      }),
+      UPDATE_USER_LASTNAME: (value) => dispatch({
+          type: "UPDATE_USER_LASTNAME",
+          value
+      }),
+      UPDATE_USER_FIRSTNAME: (value) => dispatch({
+        type: "UPDATE_USER_FIRSTNAME",
+        value
+    })
     }
   }
 export default connect(mapStateToProps,mapDispatchToProps)(UpdateCredentials)

@@ -6,7 +6,6 @@ const API_BASE_URL="http://192.168.1.3:3000/";
 class ArticleService {
 
     static getAllArticles = async (project,interval) => {
-      console.log("GET FULL DASHBOARD DATA FOR "+project+" IN "+interval)
       const query  = await client.query({
           query: gql`
             query ($project: String!,$interval: String!){

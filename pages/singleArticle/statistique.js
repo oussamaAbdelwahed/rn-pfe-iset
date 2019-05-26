@@ -11,7 +11,7 @@ class Statistique extends React.Component {
                 <Card>
                     <CardItem styles={styles.card_style}>
                         <Body>
-                            <Text style={styles.card_text_style}>Visiteurs dernières 24 heures</Text>
+                            <Text style={[styles.card_text_style,{fontSize: 14}]}>Visiteurs dernières 24 heures</Text>
                             <Text style={styles.card_text_style}>{this.props.traffic.users}</Text>
                         </Body>
                     </CardItem>
@@ -21,7 +21,7 @@ class Statistique extends React.Component {
                 <Card>
                     <CardItem styles={styles.card_style}>
                         <Body>
-                            <Text style={styles.card_text_style}>Sessions dernières 24 heures</Text>
+                            <Text style={[styles.card_text_style,{fontSize: 14}]}>Sessions dernières 24 heures</Text>
                             <Text style={styles.card_text_style}>{this.props.traffic.sessions}</Text>
                         </Body>
                     </CardItem>

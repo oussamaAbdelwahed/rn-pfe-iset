@@ -9,7 +9,9 @@ import Article from "./article"
 import Counter from "./counter"
 import { connect } from "react-redux"
 import ArticleService from '../../shared/ArticleService';
+import GeoStats from "./GeoStats"
 
+// import {} from "react-native-paper"
 
 class SingleArticle extends React.Component {
     constructor(props) {
@@ -107,6 +109,10 @@ class SingleArticle extends React.Component {
                         lineChartData={this.state.articleData.lineChartData}
                         geoMapData={this.state.articleData.geoMapData}
                     />
+
+                    <GeoStats 
+                        lineChartData={this.state.articleData.lineChartData}
+                        geoMapData={this.state.articleData.geoMapData}/>
                 </ScrollView>
                 <Counter resetCounter={this.state.resetCounter}/>
             </View>

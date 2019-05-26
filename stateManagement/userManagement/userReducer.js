@@ -69,6 +69,19 @@ const UserReducer = (state=initUserObject, {type, value}) => {
             state = initUserObject
         break
         
+        case "UPDATE_USER_LASTNAME":
+            state={
+                ...state,
+                lastname: value
+            }
+        break
+
+        case "UPDATE_USER_FIRSTNAME":
+            state={
+                ...state,
+                firstname: value
+            }
+        break
 
         default:
         break

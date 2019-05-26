@@ -67,11 +67,11 @@ class Article extends React.Component {
                                         
                                     { this.state.isAudWinner!==null ? <View><Text
                                     style={{
-                                        fontSize: 16,
+                                        fontSize: 13,
                                         color: this.state.isAudWinner ? "green" : "red",
                                                 
                                     }} note>{this.state.newAudiencePer} {" %"} 
-                                    <Text style={{fontSize:13}}> (Nombre de pages vues)</Text>
+                                    <Text style={{fontSize:13,color: this.state.isAudWinner ? "green" : "red"}}> (Nombre de pages vues)</Text>
                                     </Text>
                                             
                                     </View> : null}
@@ -135,13 +135,15 @@ class Article extends React.Component {
                         </Body>
                     </CardItem> 
             </Card>
-            <Card>
+            
+            
+            {/* <Card>
                 <Text style={{marginBottom:30,fontWeight:"bold",fontSize:30,textAlign:"center",color:"#ff7675"}}>Statistiques dernières 24 heures</Text>
                 {this.props.lineChartData && this.props.lineChartData.length > 0 ? <Text style={{marginBottom:10,fontWeight:"bold",fontSize:15,textAlign:"center"}}>Nombre des pages vues</Text> : null}
                 <PVLineChart lineChartData={this.props.lineChartData}/>
                 {this.props.geoMapData && this.props.geoMapData.length > 0 ? <Text style={{marginBottom:10,fontWeight:"bold",fontSize:15,textAlign:"center"}}>Nombre des visiteurs par pays</Text> : null}
                 <VisitorsBarChart geoMapData={this.props.geoMapData} />
-            </Card>
+            </Card> */}
         </Content>
         )
     }

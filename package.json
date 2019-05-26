@@ -38,6 +38,7 @@
         "react-native-drawer": "^2.5.1",
         "react-native-easy-grid": "^0.2.1",
         "react-native-image-picker": "^0.28.1",
+        "react-native-paper": "^2.15.2",
         "react-native-parallax-scroll-view": "^0.21.3",
         "react-native-svg-charts": "^5.2.0",
         "react-navigation": "3.6.1",

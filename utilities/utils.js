@@ -11,7 +11,6 @@ import { SecureStore } from 'expo';
 import base64 from "base-64"
 
 const shouldSubscribeTo = (project,interval) => {
-    console.log("PR0JECT= "+project+" INETRVAL = "+interval);
     let subscribeTo = {name:"refreshOccured_JA_15_MIN",sub:REFRESH_SUBSCRIPTION_JA_15_MIN};
     if(project==="JA") {
       if(interval!=="15min") {
@@ -38,7 +37,6 @@ const ignoreInputErrors= (_this,toIgnore) => {
  for(let i=0;i<toIgnore.length;i++) {
   ignored[toIgnore[i]]=false;
  }
- console.log(ignored);
  _this.setState(ignored);
 }
 
@@ -73,7 +71,6 @@ const validateAddUserForm= (_this) => {
 
 const isLoggedIn = async () => {
     const token = await SecureStore.getItemAsync("authToken")
-    //return null;
     return token;
 }
 
@@ -105,7 +102,6 @@ const isAdmin = () => {
 const getParsedToken = async() => {
   const token = await SecureStore.getItemAsync("authToken")
   if(token && token != "") {
-    console.log(token)
     let decryptedToken = token.split(".")[1]
     return JSON.parse(base64.decode(decryptedToken))
   }

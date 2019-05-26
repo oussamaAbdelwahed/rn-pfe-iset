@@ -1,18 +1,20 @@
 import React from "react"
 import { StyleSheet, View,Text,Platform,StatusBar } from "react-native"
-import {Form,Input,Label,Item,Button,Toast,Root} from "native-base"
+import {Form,Input,Label,Item,Toast,Root} from "native-base"
 import {connect} from "react-redux"
 import Header from "../../components/header/header"
 import { withNavigation } from 'react-navigation'
 import UserService from "../../shared/UserService"
 
-
+import {TextInput, Snackbar, Button, HelperText, Banner} from "react-native-paper"
 
 class UpdateEmailPage extends React.Component {
 
     state = {
         newEmail: "",
-        newEmailError: ""
+        newEmailError: "",
+        disabledSubmitButton:false,
+        networkErrorMessage: ""
     }
 
 
@@ -29,14 +31,15 @@ class UpdateEmailPage extends React.Component {
         }
 
         if(this.state.newEmail !== "") {
-            console.log(this.state.newEmail)
+            this.setState({
+                disabledSubmitButton:true
+            })
             UserService.resetEmail(this.props.user.userId,this.state.newEmail)
                 .then((res) => {
 
                     // it wont be redirect
                     this.props.navigation.navigate("confirmCode", {
-                        email: this.state.newEmail,
-                        type: "update-email"
+                        email: this.state.newEmail
                     })
                 })
                 .catch((err) => {
@@ -45,8 +48,15 @@ class UpdateEmailPage extends React.Component {
                     if(err.response.status === 401) {
                         this.setState({newEmailError: "Adresse email existe déja"})
                     }else { // 500
-                        this.showErrorAlert("Erreur Interne du Serveur!.Veuillez ressayer plus tard...")
+                        //this.showErrorAlert("Erreur Interne du Serveur!.Veuillez ressayer plus tard...")
+                        this.setState({
+                            networkErrorMessage: "Erreur Interne du Serveur!.Veuillez ressayer plus tard..."
+                        })
                     }
+                }).finally(() => {
+                    this.setState({
+                        disabledSubmitButton:false
+                    })
                 })
 
         }
@@ -65,43 +75,65 @@ class UpdateEmailPage extends React.Component {
     render() {
         return (
             <View style={styles.view_container}>
-                <Root>
-                    <Header navigation={this.props.navigation} shouldDisplayLogo={true}/>
+                <Header navigation={this.props.navigation} shouldDisplayLogo={true}/>
+                
+                {/* banner for default password */}
+                <View style={{paddingLeft: 10,paddingRight:10}}>
+                    <Banner
+                        visible={this.props.user.isDefaultPwd === 1}
+                        actions={[]}>
+                        Votre mot de passe a été généré par l'admininstrateur.
+                        Veuillez le changer pour etre en toute sécurité !
+                    </Banner>
+                </View>
+
+                {/* Header */}
+                <View>
+                    <Text style={styles.header_title}>Modifier mon adresse email</Text>
+                </View>
+
+
+                <View style={{paddingLeft:10, marginBottom:15}}>
+                    <Text style={styles.actuelEmailText}> 
+                        <Text style={styles.oldEmail}>Votre adresse email actuelle est {this.props.user.email}</Text>
+                    </Text>               
+                </View>
+
+                <View style={{marginTop:10,marginBottom:10, paddingLeft: 10, paddingRight:10}}>
+                    <TextInput 
+                        label="Nouvelle adresse email"
+                        mode="outlined"
+                        onChangeText={(value) => this.setState({newEmail: value})}
+                        error={this.state.newEmailError!== ""}/>
+                </View>
                     
-                    {/* Header */}
-                    <View>
-                        <Text style={styles.header_title}>Modifier mon adresse email</Text>
-                    </View>
+                {this.state.newEmailError!== "" && 
+                    <HelperText
+                        visible={this.state.newEmailError!== ""}
+                        type="error">
+                        {this.state.newEmailError}
+                    </HelperText>
+                }
+
+                <View style={{paddingLeft: 10, paddingRight:10}}>
+                    <Button
+                        mode="contained"
+                        onPress={this.handleSubmit}
+                        loading={this.state.disabledSubmitButton}
+                        disabled={this.state.disabledSubmitButton}>
+                            Mettre à jour
+                    </Button>
+                </View>
+
+                
 
 
-                    {/* Formulaire */}
-                    <View style={{paddingLeft:10}}>
-                        <Text style={styles.actuelEmailText}> 
-                            <Text style={styles.oldEmail}>Votre adresse email actuelle est {this.props.user.email}</Text>
-                        </Text>               
-                    </View>
-
-                    <Form>
-                        <Item stackedLabel style={{marginTop:10,marginBottom:10}}>
-                            <Label>Nouvelle adresse email</Label>
-                            <Input
-                                onChangeText={(value) => this.setState({newEmail: value})}
-                            />
-                        </Item>
-
-                        {this.state.newEmailError!== "" && 
-                            <Text style={styles.errorMessage}>{this.state.newEmailError}</Text> 
-                        }
-
-
-
-                        <View style={{paddingLeft:10, paddingRight:10}}>
-                            <Button type="primary" block style={styles.button} onPress={this.handleSubmit}>
-                                <Text style={styles.button_text}>Mettre à jour</Text>
-                            </Button>
-                        </View>
-                    </Form>
-                </Root>
+                <Snackbar
+                    visible={this.state.networkErrorMessage!== ""}
+                    duration={3000}
+                    onDismiss={()=>this.setState({networkErrorMessage: ""})}>
+                        {this.state.networkErrorMessage}
+                </Snackbar>
             </View>
         )
     }

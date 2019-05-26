@@ -1,11 +1,12 @@
 import React from "react"
-import { StyleSheet, View,Text,Platform,StatusBar,ActivityIndicator } from "react-native"
-import {Form,Input,Label,Item,Button,Toast,Root} from "native-base"
-import {InputItem} from "@ant-design/react-native"
+import { StyleSheet, View,Text,Platform,StatusBar,ScrollView } from "react-native"
 import {connect} from "react-redux"
 import Header from "../../components/header/header"
 import UserService from "../../shared/UserService"
 import {withNavigation} from "react-navigation"
+import {Button,TextInput,Snackbar,HelperText, Banner} from "react-native-paper"
+import {SecureStore} from "expo"
+
 class UpdatePasswordPage extends React.Component {
 
     state = {
@@ -16,17 +17,21 @@ class UpdatePasswordPage extends React.Component {
         newPasswordError: "",
         confirmPasswordError: "",
         isLoading:false,
+        errorNetworkPassword: "",
+        successNetworkPassword: ""
+
     }
 
 
     handleSubmit = () => {
+        this.setState({
+            oldPasswordError: "",
+            newPasswordError: "",
+            confirmPasswordError: ""
+        })
         if(this.state.oldPassword === "") {
             this.setState({
                 oldPasswordError: "Champs obligatoire"
-            })
-        }else {
-            this.setState({
-                oldPasswordError: ""
             })
         }
 
@@ -34,20 +39,12 @@ class UpdatePasswordPage extends React.Component {
             this.setState({
                 newPasswordError: "Champs obligatoire"
             })
-        }else {
-            this.setState({
-                newPasswordError: ""
-            })
         }
 
 
         if(this.state.confirmPassword === "") {
             this.setState({
                 confirmPasswordError: "Champs obligatoire"
-            })
-        }else {
-            this.setState({
-                confirmPasswordError: ""
             })
         }
 
@@ -72,108 +69,134 @@ class UpdatePasswordPage extends React.Component {
                     userId
                 })
                 .then((res) => {
-                    this.showSucessMessage("Vos modifications ont été mises à jour. Vous devez vous connecter pour des raisons de sécurité")
-                     this.setState({isLoading:false})
-                    // It wont be redirect
-                    setTimeout(() => {
+                    this.setState({successNetworkPassword: "Vos modifications ont été mises à jour. Vous devez vous connecter pour des raisons de sécurité"})
+                    
+                    setTimeout(async () => {
+                        console.log("Logout")
+
+                        await SecureStore.deleteItemAsync("authToken")
+
+                        this.setState({isLoading:false})
                         this.props.navigation.navigate("Login")
-                    },2050)
+                    },3050)
                 })
                 .catch((err) => {
                     if(err.response.status === 501) {
                         this.setState({oldPasswordError: "L'ancien mot de passe est incorrect",isLoading:false})
                     }else {
-                        this.setState({isLoading:false})
-                        this.showErrorNetworkMessage("Erreur Interne du Serveur!.Veuillez ressayer plus tard...")
+                        this.setState({isLoading:false, errorNetworkPassword: "Erreur Interne du Serveur!.Veuillez ressayer plus tard..."})
                     }
                 })
             }
         }
     }
 
-    showErrorNetworkMessage = (message) => {
-        Toast.show({
-            type: "warning",
-            position: "top",
-            text: message,
-            duration: 2000
-        })
-    }
 
-    showSucessMessage = (message) => {
-        Toast.show({
-            type: "success",
-            position: "top",
-            text: message,
-            duration: 3000
-        })
-    }
 
     render() {
         return (
             <View style={styles.view_container}>
-                <Root>
-                    <Header navigation={this.props.navigation} shouldDisplayLogo={true}/>
-                    
-                    {/* Header */}
+                <Header navigation={this.props.navigation} shouldDisplayLogo={true}/>
+                
+                <ScrollView>
+
+                    {/* banner for default password */}
+                    <View style={{paddingLeft: 10,paddingRight:10}}>
+                        <Banner
+                            visible={this.props.user.isDefaultPwd === 1}
+                            actions={[]}>
+                            Votre mot de passe a été généré par l'admininstrateur.
+                            Veuillez le changer pour etre en toute sécurité !
+                        </Banner>
+                    </View>
+
+                    {/* Title */}
                     <View>
                         <Text style={styles.header_title}>Modifier mon mot de passe</Text>
                     </View>
 
 
-                    {/* Formulaire */}
-                    <Form>
-                        <Item stackedLabel style={{marginTop:10,marginBottom:10}}>
-                            <Label>Votre ancien mot de passe</Label>
-                            <InputItem 
-                                type="password"
+                    <View style={{marginTop:50, marginBottom: 20, paddingLeft:10, paddingRight:10}}>
+
+
+                        {/* Old password */}
+                        <View>
+                            <TextInput 
+                                label="Votre ancien mot de passe"
+                                mode="outlined"
+                                secureTextEntry={true}
                                 defaultValue={this.state.oldPassword}
                                 onChangeText={(value) => this.setState({oldPassword: value})}
+                                style={{marginTop:10,marginBottom:10}}
+                                error={this.state.oldPasswordError!== ""}
                             />
-                        </Item>
-                        {this.state.oldPasswordError!== "" && 
-                            <Text style={styles.errorMessage}>{this.state.oldPasswordError}</Text> 
-                        }
 
+                            {this.state.oldPasswordError!== "" && <HelperText type="error">
+                                    {this.state.oldPasswordError}
+                                </HelperText>
+                            }
+                        </View>    
 
-                        <Item stackedLabel style={{marginTop:10,marginBottom:10}}>
-                            <Label>Nouveau mot de passe</Label>
-                            <InputItem 
-                                type="password"
+                        
+                        {/* New Password */}
+                        <View>
+                            <TextInput 
+                                label="Nouveau mot de passe"
+                                mode="outlined"
+                                secureTextEntry={true}
                                 defaultValue={this.state.newPassword}
                                 onChangeText={(value) => this.setState({newPassword: value})}
+                                style={{marginTop:10,marginBottom:10}}
+                                error={this.state.newPasswordError!== ""}
                             />
-                        </Item>
-                        {this.state.newPasswordError!== "" && 
-                            <Text style={styles.errorMessage}>{this.state.newPasswordError}</Text> 
-                        }
+
+                            {this.state.newPasswordError!== "" && <HelperText type="error">
+                                    {this.state.newPasswordError}
+                                </HelperText>
+                            }
+                        </View>    
 
 
 
-
-                        <Item stackedLabel style={{marginTop:10,marginBottom:10}}>
-                            <Label>Confirmer votre mot de passe</Label>
-                            <InputItem 
-                                type="password"
+                        {/* Confirm Password */}
+                        <View>
+                            <TextInput 
+                                label="Confirmer votre mot de passe"
+                                mode="outlined"
+                                secureTextEntry={true}
                                 defaultValue={this.state.confirmPassword}
                                 onChangeText={(value) => this.setState({confirmPassword: value})}
+                                style={{marginTop:10,marginBottom:10}}
+                                error={this.state.confirmPasswordError!== ""}
                             />
-                        </Item>
-                        {this.state.confirmPasswordError!== "" && 
-                            <Text style={styles.errorMessage}>{this.state.confirmPasswordError}</Text> 
-                        }
 
-
-
-
-                        <View style={{paddingLeft:10, paddingRight:10}}>
-                            <Button type="primary" block style={styles.button} onPress={this.handleSubmit}>
-                                <Text style={styles.button_text}>Mettre à jour</Text>
-                                {this.state.isLoading  ? <ActivityIndicator/>  : null}
-                            </Button>
+                            {this.state.confirmPasswordError!== "" && 
+                                <HelperText type="error">
+                                    {this.state.confirmPasswordError}
+                                </HelperText>
+                            }
                         </View>
-                    </Form>
-                </Root>
+
+
+                        <Button
+                            mode="contained"
+                            onPress={this.handleSubmit}
+                            loading={this.state.isLoading}
+                            disabled={this.state.isLoading}>
+                                Mettre à jour
+                        </Button>
+                    </View>
+                </ScrollView>
+
+                {/* Snackbar */}
+                <Snackbar
+                    visible={this.state.errorNetworkPassword !== "" || this.state.successNetworkPassword !== ""}
+                    duration={3000}
+                    onDismiss={()=>this.setState({errorNetworkPassword: "",successNetworkPassword: ""})}
+                    style={{backgroundColor: this.state.errorNetworkPassword !== "" ? "#e74c3c" : "#27ae60"}}>
+                        {this.state.errorNetworkPassword !== "" && this.state.errorNetworkPassword}
+                        {this.state.successNetworkPassword !== "" && this.state.successNetworkPassword}
+                </Snackbar>
             </View>
         )
     }
@@ -206,8 +229,8 @@ const styles = StyleSheet.create({
     header_title: {
         fontSize: 20,
         textAlign: "center",
-        marginBottom: 30,
-        fontWeight:"bold"
+        fontWeight:"bold",
+        marginTop: 30
     },
     oldEmail: {
         fontWeight: "700"

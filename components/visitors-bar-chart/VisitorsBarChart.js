@@ -36,17 +36,27 @@ class VisitorsBarChart extends React.Component {
               return (
                 data.country==="(not set)" ? <Text key={i}></Text> : 
                   <View key={i} style={styles.container}>
-                    <Image
-                       style={{width: 30, height: 30}}
-                       source={{uri: 'https://www.countryflags.io/'+data.code+'/flat/64.png'}}
-                    />
-                    <Text>{data.country+" : "+ data.visits + str} </Text>
+
+                    <View style={{
+                      paddingVertical: 15,
+                      paddingHorizontal: 10,
+                      flexDirection: "row",
+                      alignItems: "center"
+                    }}>
+                      <Image
+                        style={{width: 30, height: 30}}
+                        source={{uri: 'https://www.countryflags.io/'+data.code+'/flat/64.png'}}
+                      />
+                      <Text style={{paddingLeft: 10}}>{data.country+" : "+ data.visits + str} </Text>
+                    </View>
+                    
+                    
                     <ProgressBarAndroid
                         styleAttr="Horizontal"
-                        style={{height:30}}
+                        style={{height:30,marginLeft:10,marginRight:10}}
                         indeterminate={false}
                         progress={ 1 / data.perc}
-                        color="#4cd137"
+                        color="#2980b9"
                     />
                  </View>
               )
@@ -63,7 +73,6 @@ const styles = StyleSheet.create({
     container: {
       flex: 2,
       justifyContent: 'space-evenly',
-      padding: 10,
       height:90,
       width:"100%"
     },
