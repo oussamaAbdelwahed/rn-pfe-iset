@@ -35,7 +35,7 @@ class CardArticle extends React.Component {
             content: this.props.article.description,
             pages_views:this.props.article.pages_views,
             nbr_sales:this.props.article.nbr_ventes,
-            image_url: this.props.article.image_url || "https://images.unsplash.com/photo-1552796220-db7b4c3824a2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1267&q=80"
+            image_url: this.props.article.image_thumb && this.props.article.image_thumb !=="image" ? this.props.article.image_thumb :  "https://images.unsplash.com/photo-1552796220-db7b4c3824a2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1267&q=80"
         };
         this.props.UPDATE_ARTICLE_META(obj)
         //const pushAction = StackActions.push({routeName:"SingleArticleView",params:{articleId:this.props.article.id,projectIntervale:this.props.project.projectIntervale}});
@@ -109,8 +109,8 @@ class CardArticle extends React.Component {
                         }
 
                         <CardItem cardBody bordered>
-                            <Image source={{uri: 
-                            "https://images.unsplash.com/photo-1552796220-db7b4c3824a2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1267&q=80"}} 
+                            <Image source={{uri:
+                            this.props.article.image_thumb && this.props.article.image_thumb !=="image" ? this.props.article.image_thumb :  "https://images.unsplash.com/photo-1552796220-db7b4c3824a2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1267&q=80"}} 
                             style={{height: 200, width: null, flex: 1}}/>
                         </CardItem>
 

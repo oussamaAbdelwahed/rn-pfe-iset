@@ -35,16 +35,16 @@ class LoginPage extends Component {
             if(res.login.token) {
                   // save token in Secure Store
                   saveAuthToken(res.login.token)
-                
-                
+              
                    // update the user and auth states
                    getParsedToken(res.login.token).then((decryptedToken) => {
+                     this.props.UPDATE_PROJECT_TYPE(decryptedToken.defaultSelectedProject);
+                     this.props.UPDATE_PROJECT_INTERVALE(decryptedToken.defaultSelectedPeriod);
                      this.props.SAVE_USER(decryptedToken)
                      this.props.UPDATE_AUTH_STATUS(true)
                      this.props.UPDATE_ADMIN_STATUS(decryptedToken.isAdmin>0)
                      this.setState({isLoading:false})
 
-                     
                      // navigate to dashboard
                      this.props.navigation.navigate("Tableau de board");
                    })      
@@ -182,7 +182,8 @@ class LoginPage extends Component {
 const mapStateToProps = state => {
   return {
       auth: state.auth,
-      user: state.user
+      user: state.user,
+      project: state.project
   }
 }
 
@@ -212,6 +213,14 @@ const mapDispatchToProps = dispatch => {
               minImageUrl: token.minImageUrl,
               bigImageUrl:token.bigImageUrl
           }
+      }),
+      UPDATE_PROJECT_TYPE : (value) => dispatch({
+        type: "UPDATE_PROJECT_TYPE",
+        value
+      }),
+      UPDATE_PROJECT_INTERVALE : (value) => dispatch({
+        type: "UPDATE_PROJECT_INTERVALE",
+        value
       })
   }
 }

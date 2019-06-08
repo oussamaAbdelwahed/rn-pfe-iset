@@ -82,7 +82,7 @@ class Article extends React.Component {
                 }
 
                     <CardItem cardBody bordered>
-                        <Image source={{uri: this.props.article.image_url }} 
+                        <Image source={{uri: this.props.article.image_url && this.props.article.image_url !=="image" ? this.props.article.image_url : "https://images.unsplash.com/photo-1552796220-db7b4c3824a2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1267&q=80" }} 
                             style={{height: 200, width: null, flex: 1}}/>
                     </CardItem>
 

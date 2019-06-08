@@ -4,6 +4,7 @@ import { Picker, Form, Icon, View, Label} from "native-base"
 import { connect } from "react-redux"
 import {getParsedToken} from '../../utilities/utils';
 
+
 const token = getParsedToken();
 
 class Select extends React.PureComponent {
@@ -17,7 +18,7 @@ class Select extends React.PureComponent {
                 }}>
                     <Label style={{
                         fontSize: 15
-                    }}>Selectionner le projet :</Label>
+                    }}>Sélectionner le projet :</Label>
                     <Picker 
                         mode="dialog"
                         selectedValue={this.props.project.projectType}
@@ -36,7 +37,7 @@ class Select extends React.PureComponent {
 
                     <Label style={{
                         fontSize: 15
-                    }}>Selectionner la periode :</Label>
+                    }}>Sélectionner la période :</Label>
                     <Picker 
                         mode="dialog"
                         selectedValue={this.props.project.projectIntervale}
@@ -47,8 +48,8 @@ class Select extends React.PureComponent {
                             color: "grey"
                         }}
                      >
-                        <Picker.Item label="15min" value="15 minutes"/> 
-                        <Picker.Item label="24h" value="24 heures"/>
+                        <Picker.Item label="15 minutes" value="15min"/> 
+                        <Picker.Item label="24 heures" value="24h"/>
                     </Picker>
                 </Form>
             </View>
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     },
 })
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
     return {
         project: state.project
     }

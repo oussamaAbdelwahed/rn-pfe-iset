@@ -22,11 +22,11 @@ const authMiddleware = new ApolloLink((operation, forward) => {
 
 
 const httpLink=new HttpLink({
-   uri: 'http://192.168.43.226:'+WS_PORT+'/graphql'
+   uri: 'http://192.168.1.2:'+WS_PORT+'/graphql'
 })
 
 const wsLink = new WebSocketLink({
-  uri: `ws://192.168.43.226:${WS_PORT}/graphql`,
+  uri: `ws://192.168.1.2:${WS_PORT}/graphql`,
   options: {
     reconnect: true
   }

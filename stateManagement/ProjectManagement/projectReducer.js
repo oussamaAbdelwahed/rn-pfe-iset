@@ -12,17 +12,17 @@ const ProjectReducer = (state=initProjectObject, action) => {
                 ...state,
                 projectType: action.value
             }
-        break
+        break;
 
         case "UPDATE_PROJECT_INTERVALE":
             state = {
                 ...state,
                 projectIntervale: action.value
             }
-        break
+        break;
 
         default:
-        break
+        break;
     }
 
     return state

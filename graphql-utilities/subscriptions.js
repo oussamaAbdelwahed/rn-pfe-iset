@@ -10,6 +10,7 @@ const RETURNED_DATA_STRUCTURE = `
       nbr_ventes
       pages_views
       published_at
+      image_thumb
     }
     nbrUsers
     nbrSessions
@@ -89,6 +90,10 @@ const subscribe  =async (_this,shouldSubscribeTo = {sub:REFRESH_SUBSCRIPTION_JA_
     variables: {authToken:token}
   }).subscribe({
     next(data) {
+      if(!data.data || !data.data[_this.state.subscribingTO.name]){
+        _this.setState({isNetworkErrorShowed:true,isLoading:false});
+        return ;
+      }
       _this.setState((prevState)=>{
         return {
           ...prevState,

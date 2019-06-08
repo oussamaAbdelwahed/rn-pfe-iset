@@ -4,6 +4,7 @@ import { FlatList } from "react-native";
 import { Content } from "native-base";
 import {withNavigation} from 'react-navigation';
 
+
 class Article extends React.Component {
 
     constructor(props) {
@@ -41,6 +42,7 @@ class Article extends React.Component {
 
 
     render() {
+        const d = new Date();
         return (
             <Content padder>
                  <FlatList 
@@ -53,8 +55,12 @@ class Article extends React.Component {
                                     navigation={this.props.navigation}
                                 />
                     }}
-                    keyExtractor={article => article.id.toString() || Math.random()+ ""}
-                /> 
+                    keyExtractor={
+                        (article) => {
+                          return ""+Math.random()+""+d.getTime()
+                        }
+                    }
+                 /> 
             </Content>
             
         )

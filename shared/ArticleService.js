@@ -1,7 +1,5 @@
 import gql from "graphql-tag"
 import client from "../config/graphql-ws.config"
-import axios from 'axios';
-const API_BASE_URL="http://192.168.1.3:3000/";
 
 class ArticleService {
 
@@ -17,6 +15,7 @@ class ArticleService {
                   nbr_ventes
                   pages_views
                   published_at
+                  image_thumb
                 }
                 nbrUsers
                 nbrSessions
@@ -55,10 +54,6 @@ class ArticleService {
         })
         return query.data.getSingleArticleData  
     }
-
-    static sendDashboardConfigurtion = (projectName,interval) => {
-       return axios.post(`${API_BASE_URL}dashboard/setup`,{projectName,interval});
-    };
 }
 
 export default ArticleService

@@ -1,7 +1,7 @@
 import React from "react"
 import { View, Card, CardItem, Body, Text } from "native-base";
 import { StyleSheet } from "react-native"
-
+import Numeral from 'numeral';
 
 class Statistique extends React.Component {
 
@@ -12,7 +12,8 @@ class Statistique extends React.Component {
                     <CardItem styles={styles.card_style}>
                         <Body>
                             <Text style={[styles.card_text_style,{fontSize: 14}]}>Visiteurs dernières 24 heures</Text>
-                            <Text style={styles.card_text_style}>{this.props.traffic.users}</Text>
+                            <Text style={styles.card_text_style}>{Numeral(this.props.traffic.users).format("0 a")}</Text>
+                            <Text style={styles.card_text_style}>({Numeral(this.props.traffic.users).format("0 a")})</Text>
                         </Body>
                     </CardItem>
                 </Card>
@@ -22,7 +23,8 @@ class Statistique extends React.Component {
                     <CardItem styles={styles.card_style}>
                         <Body>
                             <Text style={[styles.card_text_style,{fontSize: 14}]}>Sessions dernières 24 heures</Text>
-                            <Text style={styles.card_text_style}>{this.props.traffic.sessions}</Text>
+                            <Text style={styles.card_text_style}>{Numeral(this.props.traffic.sessions).format("0 a")}</Text>
+                            <Text style={styles.card_text_style}>({Numeral(this.props.traffic.sessions).format("0,0,0,0")})</Text>
                         </Body>
                     </CardItem>
                 </Card>
@@ -33,7 +35,7 @@ class Statistique extends React.Component {
                     <CardItem styles={styles.card_style}>
                         <Body>
                             <Text style={styles.card_text_style}>Abonnés actifs en temps réel</Text>
-                            <Text style={styles.card_text_style}>{this.props.traffic.activeSubscribers}</Text>
+                            <Text style={styles.card_text_style}>{Numeral(this.props.traffic.activeSubscribers).format("0 a")}</Text>
                         </Body>
                     </CardItem>
                 </Card> 

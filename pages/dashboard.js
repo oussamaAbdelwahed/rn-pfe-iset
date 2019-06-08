@@ -13,7 +13,6 @@ import { connect } from "react-redux"
 import {withNavigation} from 'react-navigation';
 import {Banner} from "react-native-paper"
 
-import {isLoggedIn} from '../utilities/utils';
 
 class DashboardPage extends React.Component {
     state = {
@@ -30,27 +29,19 @@ class DashboardPage extends React.Component {
         resetCounter:false
     }
 
-   
-
     componentWillUnmount() {
         this.subscriptionObserver.unsubscribe();
     }
 
     async componentDidMount() {
-        // update the projectType state
-        this.props.UPDATE_PROJECT_TYPE(this.props.user.defaultSelectedProject)
-        // update the project intervale
-        this.props.UPDATE_PROJECT_INTERVALE(this.props.user.defaultSelectedPeriod)
         this.getDashboardData(this.props.user.defaultSelectedProject,this.props.user.defaultSelectedPeriod,false,null);
         subscribe(this,shouldSubscribeTo(this.props.user.defaultSelectedProject,this.props.user.defaultSelectedPeriod));
     }
 
-    
 
     render() {    
         if(this.state.isLoading) {
             return (
-    
                 <View style={styles.view_spinner_container}>
                      <Spinner color="#e53d22"/>                            
                 </View>    
@@ -115,10 +106,13 @@ class DashboardPage extends React.Component {
 
 
     getDashboardData = (project,interval,whenChangingSelect=false,logo=this.state.logo) => {
-  
-
         ArticleService.getAllArticles(project,interval)
             .then((res) => {
+                //if ! articles //error throw message.
+                if(!res || !res.getFullDashboardData){
+                    this.setState({isNetworkErrorShowed:true,isLoading:false});
+                    return ;
+                }
                   this.setState((prevState)=>{
                          return {
                             ...prevState,

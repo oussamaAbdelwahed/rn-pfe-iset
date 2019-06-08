@@ -1,6 +1,6 @@
 import gql from "graphql-tag"
 import client  from "../config/graphql-ws.config";
-const API_BASE_URL="http://192.168.43.226:3000/";
+const API_BASE_URL="http://192.168.1.2:3000/";
 
 class LoginService {
   static login = async (email,password) => {
