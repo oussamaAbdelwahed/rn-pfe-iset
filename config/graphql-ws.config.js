@@ -8,8 +8,6 @@ import {extractAuthToken} from '../graphql-utilities/gql-utils';
 import { IP_ADRESSE, WS_PORT} from "./env"
 
 
-
-
 const authMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext({
     headers: {
@@ -19,14 +17,12 @@ const authMiddleware = new ApolloLink((operation, forward) => {
   return forward(operation);
 })
 
-
-
 const httpLink=new HttpLink({
-   uri: 'http://192.168.1.2:'+WS_PORT+'/graphql'
+   uri: 'http://192.168.43.137:'+WS_PORT+'/graphql'
 })
 
 const wsLink = new WebSocketLink({
-  uri: `ws://192.168.1.2:${WS_PORT}/graphql`,
+  uri: `ws://192.168.43.137:${WS_PORT}/graphql`,
   options: {
     reconnect: true
   }
@@ -41,13 +37,9 @@ const link = split(
   concat(authMiddleware,httpLink)
 );
 
-
-
 const client =  new ApolloClient({
   link,
   cache: new InMemoryCache()
 });
-
-
 
 export default client;

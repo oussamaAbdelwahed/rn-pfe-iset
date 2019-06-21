@@ -41,6 +41,12 @@ class UpdatePasswordPage extends React.Component {
             })
         }
 
+        if(this.state.newPassword && this.state.newPassword.length <7) {
+            this.setState({
+                newPasswordError: "Le mot de passe doit avoir au minimum 7 caractères"
+            })
+        }
+
 
         if(this.state.confirmPassword === "") {
             this.setState({
@@ -83,9 +89,11 @@ class UpdatePasswordPage extends React.Component {
                 .catch((err) => {
                     if(err.response.status === 501) {
                         this.setState({oldPasswordError: "L'ancien mot de passe est incorrect",isLoading:false})
-                    }else {
-                        this.setState({isLoading:false, errorNetworkPassword: "Erreur Interne du Serveur!.Veuillez ressayer plus tard..."})
-                    }
+                    
+                }
+                 //else {
+                      //  this.setState({isLoading:false, errorNetworkPassword: "Erreur Interne du Serveur!.Veuillez ressayer plus tard..."})
+                   // }
                 })
             }
         }

@@ -31,10 +31,10 @@ class LoginPage extends Component {
 
         
         this.loginHandler(email,password)
-          .then((res) => {
+          .then(async (res) => {
             if(res.login.token) {
                   // save token in Secure Store
-                  saveAuthToken(res.login.token)
+                  await saveAuthToken(res.login.token)
               
                    // update the user and auth states
                    getParsedToken(res.login.token).then((decryptedToken) => {

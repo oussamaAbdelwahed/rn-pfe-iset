@@ -1,9 +1,13 @@
 import gql from "graphql-tag"
-import client from "../config/graphql-ws.config"
+//import client from "../config/graphql-ws.config"
+
+import {getGQLClient} from '../graphql-utilities/gql-utils';
+
 
 class ArticleService {
 
     static getAllArticles = async (project,interval) => {
+      const client = await getGQLClient();
       const query  = await client.query({
           query: gql`
             query ($project: String!,$interval: String!){
@@ -32,6 +36,7 @@ class ArticleService {
 
     //getting data for single article view 
     static  getSingleArticleFreshData = async (project,articleId,projectIntervale) => {
+          const client = await getGQLClient();
           const query  = await client.query({
             query: gql`
              query ($project: String!,$articleId: ID!,$projectIntervale: String!) {

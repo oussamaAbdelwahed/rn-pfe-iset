@@ -13,7 +13,7 @@ class Statistique extends React.Component {
                         <Body>
                             <Text style={[styles.card_text_style,{fontSize: 14}]}>Visiteurs dernières 24 heures</Text>
                             <Text style={styles.card_text_style}>{Numeral(this.props.traffic.users).format("0 a")}</Text>
-                            <Text style={styles.card_text_style}>({Numeral(this.props.traffic.users).format("0 a")})</Text>
+                            <Text style={styles.card_text_style}>({Numeral(this.props.traffic.users).format("0,0,0,0")})</Text>
                         </Body>
                     </CardItem>
                 </Card>

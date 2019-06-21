@@ -64,7 +64,7 @@ class SingleArticle extends React.Component {
                     resetCounter:!prevState.resetCounter
                 }
             });
-        },50000); 
+        },20000); 
         this.setState({intervalId: intId});
     }
 

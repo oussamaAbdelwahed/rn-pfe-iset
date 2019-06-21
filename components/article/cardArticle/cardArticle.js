@@ -7,7 +7,7 @@ import { connect } from "react-redux"
 import {mustShowPageViewsVisualEffect,mustShowNbrSalesVisualEffect} from '../../../business-logic/audience-indicator';
 import  {withNavigation} from 'react-navigation'
 import {Button} from "react-native-paper"
-class CardArticle extends React.Component {
+class CardArticle extends React.PureComponent {
 
     state = {
         article:null,
@@ -57,8 +57,7 @@ class CardArticle extends React.Component {
         let b1=false;
         let b2=false;
         if(nextProps.isSelectsChanged === prevState.isSelectsChanged){ 
-            //donc on n a pas changer de selects et un nouveau refrech a eu lieu
-            if(prevState.article !== null) {
+            if(prevState.article) {
                b1 = mustShowPageViewsVisualEffect(prevState.article.pages_views,nextProps.article.pages_views);
                b2 = mustShowNbrSalesVisualEffect(prevState.article.nbr_ventes,nextProps.article.nbr_ventes);
                newAudiencePer = +CardArticle.getNewAudiencePercentage(+prevState.article.pages_views,+nextProps.article.pages_views,2);
@@ -67,6 +66,7 @@ class CardArticle extends React.Component {
         }
         const article={...nextProps.article};
         return {
+            ...prevState,
             article: article,
             isAudWinner:isAudWinner,
             newAudiencePer:newAudiencePer,
@@ -84,14 +84,13 @@ class CardArticle extends React.Component {
                         marginBottom: 20
                     }}
                     >
-
                         {this.state.mustShowNbrPageViewsVE ?
                             <CardItem header bordered>
                                 <Left>
                                     <Body>
                                         <AntDesign name={this.state.isAudWinner ? "up" : "down"} size={16} color={this.state.isAudWinner ? "green" : "red"} />
                                     
-                                        { this.state.isAudWinner!==null ? <View><Text
+                                        { this.state.isAudWinner!== null ? <View><Text
                                         style={{
                                             fontSize: 16,
                                             color: this.state.isAudWinner ? "green" : "red",
@@ -154,7 +153,7 @@ class CardArticle extends React.Component {
                                 paddingBottom:5
                             }}> 
                                 <Grid>
-                                    <Col style={{backgroundColor : this.state.mustShowNbrSalesVE && this.props.project.projectType !== "TAR" ? "green" : "white",}}> 
+                                    <Col style={{backgroundColor : this.state.mustShowNbrSalesVE && this.props.project.projectType == "JA" ? "green" : "white",}}> 
                                         {this.props.project.projectType==="JA" ? <Text style={{textAlign:"center",fontSize: 15,color:this.state.mustShowNbrSalesVE ? "white" : "black"}}>Ventes</Text> : <Text></Text>}
                                         {this.props.project.projectType==="JA" ? <Text style={{textAlign:"center",fontSize: 13,color:this.state.mustShowNbrSalesVE ? "white" : "black"}}>{this.props.article.nbr_ventes}</Text> : <Text></Text>}
                                     </Col>

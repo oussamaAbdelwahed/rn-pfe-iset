@@ -1,11 +1,13 @@
 import gql from "graphql-tag"
-import client  from "../config/graphql-ws.config";
+//import client  from "../config/graphql-ws.config";
+import {getGQLClient} from '../graphql-utilities/gql-utils';
 import axios from "axios"
 import {BASE_URL} from "../config/env"
 
 //we probably need only this functionality in mobile app(updating profile credentials)
 class UserService {
     static async updateProfileCredentials (credentials) {
+      const client = await getGQLClient();
         const query  = await client.mutate({
             mutation: gql`
               mutation ($credentials: AccountCredentials!){
@@ -39,6 +41,7 @@ class UserService {
     // }
 
     static async getUserCredentials(userId) {
+      const client = await getGQLClient();
       const query = await client.query({
         query: gql`
           query ($userId: Int!) { 

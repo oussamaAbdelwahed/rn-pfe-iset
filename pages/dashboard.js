@@ -36,6 +36,8 @@ class DashboardPage extends React.Component {
     async componentDidMount() {
         this.getDashboardData(this.props.user.defaultSelectedProject,this.props.user.defaultSelectedPeriod,false,null);
         subscribe(this,shouldSubscribeTo(this.props.user.defaultSelectedProject,this.props.user.defaultSelectedPeriod));
+        this.props.UPDATE_PROJECT_TYPE(this.props.user.defaultSelectedProject);
+        this.props.UPDATE_PROJECT_INTERVALE(this.props.user.defaultSelectedPeriod)
     }
 
 
@@ -108,7 +110,6 @@ class DashboardPage extends React.Component {
     getDashboardData = (project,interval,whenChangingSelect=false,logo=this.state.logo) => {
         ArticleService.getAllArticles(project,interval)
             .then((res) => {
-                //if ! articles //error throw message.
                 if(!res || !res.getFullDashboardData){
                     this.setState({isNetworkErrorShowed:true,isLoading:false});
                     return ;
@@ -123,7 +124,8 @@ class DashboardPage extends React.Component {
                              nbrUsers: res.getFullDashboardData.nbrUsers,
                              nbrSessions: res.getFullDashboardData.nbrSessions,
                              nbrActiveSubscribers: res.getFullDashboardData.nbrActiveSubscribers,
-                             isLoading: false
+                             isLoading: false,
+                             isNetworkErrorShowed:false
                         };
                     })
                 }).catch(err => {
@@ -136,13 +138,10 @@ class DashboardPage extends React.Component {
     }
 
     shouldComponentUpdate(nextProps,nextState) {
-        if(nextState.articles.length !== this.state.articles.length  || this.state.subscribingTO.name !== nextState.subscribingTO.name)
+        if((nextState.articles.length !== this.state.articles.length || nextState.articles.length===0)  || this.state.subscribingTO.name !== nextState.subscribingTO.name)
           return true;
 
         if(nextState.resetCounter !== this.state.resetCounter) return true;
-
-        if(this.state.subscribingTO.hasOwnProperty("name") && this.state.subscribingTO.name !== nextState.subscribingTO.name) 
-           return true;
 
         if(
             nextState.nbrUsers !== this.state.nbrUsers ||
@@ -151,16 +150,11 @@ class DashboardPage extends React.Component {
         ){
             return true;
         }
-        if(nextState.isNetworkErrorShowed === true) return true;
-        if(this.props.project.projectType !== nextProps.project.projectType) {
-            return true;
-        }
+        if(nextState.isNetworkErrorShowed !== this.state.isNetworkErrorShowed) return true;
+ 
         if(this.state.isSelectsChanged !== nextState.isSelectsChanged) return true;
         if(this.state.isLoading !== nextState.isLoading) return true;
-        //for(let i=0;i<this.state.articles.length;i++)
-          //if(JSON.stringify(nextState.articles[i]) !== JSON.stringify(this.state.articles[i]))
-            //return true;
-
+     
         return false;
     }
  

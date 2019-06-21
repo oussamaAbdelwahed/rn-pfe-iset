@@ -21,15 +21,21 @@ const MainNavigationDrawer = createDrawerNavigator(
                 SingleArticleView: SingleArticleView,
             },{headerMode: "none"}) 
         },
-        "Parametres": {
+        "Paramètres": {
             screen: createStackNavigator({
                 setting: SettingPage,
                 profile: UpdateCredentialsPage,
                 UpdateEmail: UpdateEmailPage,
                 UpdatePassword: UpdatePasswordPage,
-                confirmCode: ConfirmCode
+                confirmCode: ConfirmCode,
+                logout:Logout
             },{headerMode: "none"})
         },
+        "Déconnexion": {
+            screen: createStackNavigator({
+                logout:Logout
+            },{headerMode: "none"})
+        }
         // "Mon profile": {
         //     screen: UpdateCredentials
         // },
@@ -90,10 +96,11 @@ const customDrawerContent = (props) => {
                     
                 <DrawerItems  {...props} onItemPress={async (route)=>{
                     if(route.route.routeName==="Tableau de board") {
-                       props.navigation.navigate("tableaudebord");
+                      props.navigation.navigate("tableaudebord");
+                    }else if(route.route.routeName==="logout" || route.routeName==="logout"){
+                      props.navigation.navigate("logout");
                     }else{
-                       console.log("in router interceptor else close");
-                       props.onItemPress(route);
+                       props.onItemPress(route);                     
                     }
                 }}/>
                 {/* <Button mode="text">Logout</Button> */}

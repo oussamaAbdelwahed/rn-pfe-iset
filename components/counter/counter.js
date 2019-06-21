@@ -5,7 +5,6 @@ import { Ionicons } from "@expo/vector-icons"
 import { CONTERDOWN_NUMBER } from "../../config/env"
 class Counter extends React.Component{
 
-
     state = {
         countdown: CONTERDOWN_NUMBER,
         fill: 0,

@@ -13,13 +13,13 @@ class SettingPage extends React.Component{
     state= {
         isLoading: false
     }
-    logout = async() => {
+    logout = () => {
         console.log("logout")
         this.setState({isLoading: true})
-        await SecureStore.deleteItemAsync("authToken")
-        this.setState({isLoading: false})
-
-        this.props.navigation.navigate("Login")
+        SecureStore.deleteItemAsync("authToken").then(()=>{
+            this.setState({isLoading: false})
+            this.props.navigation.navigate("Login")
+        })
     }
 
     render() {

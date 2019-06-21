@@ -3,15 +3,13 @@ import { connect } from "react-redux"
 import { StyleSheet ,Image} from "react-native"
 import LogoJA from "./logoJA"
 import LogoJAB from "./logoJab"
-import LogoTAR from "./logoTAR"
+
 
 import { View } from "native-base";
 import {  Ionicons } from "@expo/vector-icons"
-import { withNavigation } from 'react-navigation'
+import { withNavigation } from 'react-navigation';
 
 class Header extends React.PureComponent {
-
-
     renderLogoProjet = () => {
         if(this.props.project.projectType === "JA" && this.props.shouldDisplayLogo === true) {
             return <LogoJA/>

@@ -1,9 +1,12 @@
 import gql from "graphql-tag"
-import client  from "../config/graphql-ws.config";
-const API_BASE_URL="http://192.168.1.2:3000/";
+//import client  from "../config/graphql-ws.config";
+import {getGQLClient} from '../graphql-utilities/gql-utils';
+const API_BASE_URL="http://192.168.43.137:3000/";
 
 class LoginService {
+  
   static login = async (email,password) => {
+    const client = await getGQLClient();
     const query  = await client.query({
         query: gql`
           query ($email: String!,$password:String!){
@@ -21,6 +24,7 @@ class LoginService {
 
 
    static addUser = async (user) => {
+    const client = await getGQLClient();
       const query = await client.mutate({
         mutation: gql`
           mutation ($user: User!) {

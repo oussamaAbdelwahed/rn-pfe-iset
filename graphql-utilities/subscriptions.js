@@ -1,7 +1,8 @@
 import {gql} from "apollo-boost";
-import client from "../config/graphql-ws.config";
-import { SecureStore } from 'expo';
-import {extractAuthToken} from './gql-utils'; 
+//import client from "../config/graphql-ws.config";
+import {getGQLClient,extractAuthToken} from './gql-utils';
+//import {extractAuthToken} from './gql-utils'; 
+
 const RETURNED_DATA_STRUCTURE = `
     articles {
       id
@@ -68,8 +69,6 @@ const REFRESH_SUBSCRIPTION_TAR_24_H = gql`
 `;
 
 
-
-
 const SubsMappings = {
   "REFRESH_SUBSCRIPTION_JA_15_MIN":"refreshOccured_JA_15_MIN",
   "REFRESH_SUBSCRIPTION_JA_24_H":"refreshOccured_JA_24_H",
@@ -80,11 +79,10 @@ const SubsMappings = {
 };
 
 
-
 const subscribe  =async (_this,shouldSubscribeTo = {sub:REFRESH_SUBSCRIPTION_JA_15_MIN})=>{
    const token = await extractAuthToken();
+   const client = await getGQLClient();
    if(token ===null) return ;
-   console.log("**********************SHOULD SUBSCRIBE TO "+shouldSubscribeTo.sub+"****************");
    _this.subscriptionObserver = client.subscribe({
     query:  shouldSubscribeTo.sub,
     variables: {authToken:token}
@@ -108,7 +106,6 @@ const subscribe  =async (_this,shouldSubscribeTo = {sub:REFRESH_SUBSCRIPTION_JA_
     error(err) { console.error('err', err); },
   });
 }
-
 
 export {
   REFRESH_SUBSCRIPTION_JA_15_MIN,

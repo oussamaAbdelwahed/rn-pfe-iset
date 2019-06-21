@@ -117,7 +117,7 @@ class Article extends React.Component {
                             paddingBottom:5
                         }}> 
                             <Grid>
-                                <Col style={{backgroundColor : this.props.article.projectType !== "TAR" && this.state.mustShowNbrSalesVE ? "green" : "white"}}>
+                                <Col style={{backgroundColor : this.props.article.projectType == "JA" && this.state.mustShowNbrSalesVE ? "green" : "white"}}>
                                     {this.props.article.projectType==="JA"?<Text style={{textAlign:"center",fontSize: 15,color:this.state.mustShowNbrSalesVE ? "white" : "black"}}>Ventes</Text>:<Text></Text>}
                                     {this.props.article.projectType==="JA"?<Text style={{textAlign:"center",fontSize: 13,color:this.state.mustShowNbrSalesVE ? "white" : "black"}}>{this.state.nbrSales}</Text>:<Text></Text>}
                                 </Col>

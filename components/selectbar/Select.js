@@ -2,13 +2,10 @@ import React from "react"
 import { StyleSheet } from "react-native"
 import { Picker, Form, Icon, View, Label} from "native-base"
 import { connect } from "react-redux"
-import {getParsedToken} from '../../utilities/utils';
 
 
-const token = getParsedToken();
 
-class Select extends React.PureComponent {
-
+class Select extends React.Component {
     render() {
         return (
             <View>

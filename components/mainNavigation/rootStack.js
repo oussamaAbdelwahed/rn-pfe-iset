@@ -1,11 +1,11 @@
-import React from "react"
-import {createStackNavigator,createAppContainer,createSwitchNavigator} from "react-navigation"
+import {createAppContainer,createSwitchNavigator} from "react-navigation"
 import ResetPasswordPage from "../../pages/resetPassword/resetPassword"
 import SetNewPasswordPage from "../../pages/setNewPassword/setNewPassword"
 import FirstScreen from "../../pages/firstScreen/firstScreen"
 import LoginPage from "../../pages/login/Login"
 import MainNavigationDrawer from "./mainNavigation"
 import ConfirmCodeResetPasswordPage from "../../pages/confirmCode/confirmCodeResetPassword"
+
 const RootNavigation = createSwitchNavigator({
     Home: { screen: FirstScreen},
     rp: { screen: ResetPasswordPage},
@@ -16,8 +16,7 @@ const RootNavigation = createSwitchNavigator({
     },
     ConfirmCodeResetPasswordPage: {
         screen: ConfirmCodeResetPasswordPage
-    }
-    
+    }, 
 },
 {
     initialRouteName:'Home',
